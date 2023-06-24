@@ -32,5 +32,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-# security
+# firebase
+.firebase
 firebase.json
