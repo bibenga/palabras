@@ -18,14 +18,14 @@
         </q-input>
       </template>
       <template v-slot:bottom>
-        <q-btn
+        <!-- <q-btn
           @click="() => fakeAdd()"
           class="q-ml-sm"
           outline
           color="primary"
           label="Fake Add"
           icon="add"
-        />
+        /> -->
         <q-btn
           @click="() => add()"
           class="q-ml-sm"
