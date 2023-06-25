@@ -153,7 +153,7 @@ const save = async () => {
       timeout: 2000,
     });
   } else {
-    setDoc(
+    await setDoc(
       doc(firestore, 'words', props.id),
       {
         word1: word1.value,
