@@ -13,16 +13,8 @@
       :filter="filter"
       binary-state-sort
       @request="onRequest"
+      @row-click="(evt, row, index) => rowClicked(row)"
     >
-      <!-- <template v-slot:top>
-        <q-space />
-        <q-input debounce="300" color="primary">
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template> -->
-
       <!-- <template v-slot:top-right>
         <q-input
           borderless
@@ -61,7 +53,7 @@
           color="negative"
           label="Delete selected"
         />
-        <q-space />
+        <!-- <q-space />
         <q-input
           borderless
           dense
@@ -72,16 +64,16 @@
           <template v-slot:append>
             <q-icon name="search" />
           </template>
-        </q-input>
+        </q-input> -->
       </template>
 
-      <!-- <template v-slot:body-cell-isLearnedFlg="props">
+      <template v-slot:body-cell-isLearnedFlg="props">
         <q-td :props="props">
-          <q-checkbox v-model="props.row.isLearnedFlg" />
+          <q-checkbox v-model="props.row.isLearnedFlg" color="grey" disable />
         </q-td>
-      </template> -->
+      </template>
 
-      <template v-slot:header-selection="scope">
+      <!-- <template v-slot:header-selection="scope">
         <q-checkbox v-model="scope.selected" color="grey" />
       </template>
 
@@ -112,7 +104,7 @@
             />
           </q-td>
         </q-tr>
-      </template>
+      </template> -->
     </q-table>
 
     <!-- <q-btn
@@ -180,9 +172,23 @@ const pagination = ref({
   rowsNumber: 0,
 });
 const columns = [
-  { name: 'id', required: true, label: 'ID', align: 'left' },
-  { name: 'word1', required: true, label: 'Word1', align: 'left' },
-  { name: 'word2', required: true, label: 'Word2', align: 'left' },
+  // { name: 'id', required: true, label: 'ID', align: 'left' },
+  {
+    name: 'word1',
+    required: true,
+    label: 'Word1',
+    align: 'left',
+    field: (row) => row.word1,
+    format: (val) => val?.join(', '),
+  },
+  {
+    name: 'word2',
+    required: true,
+    label: 'Word2',
+    align: 'left',
+    field: (row) => row.word2,
+    format: (val) => val?.join(', '),
+  },
   {
     name: 'isLearnedFlg',
     required: true,
@@ -319,7 +325,8 @@ const edit = (doc) => {
 };
 
 const rowClicked = async (row) => {
-  console.log('rowClicked', row);
+  console.log('rowClicked', row.id);
+  router.push(`/word/${row.id}`);
 };
 
 const del = async () => {
