@@ -1,70 +1,76 @@
 <template>
-  <q-layout v-if="loaded" view="hHh Lpr lFf">
-    <q-form @submit.prevent="save" class="q-gutter-md">
-      <q-card flat>
-        <q-card-section>
-          <div v-if="isNew" class="text-h6">Add new word</div>
-          <div v-else class="text-h6">Edit {{ id }} word</div>
-        </q-card-section>
+  <q-page>
+    <q-layout v-if="loaded" view="hHh Lpr lFf">
+      <q-form @submit.prevent="save" class="q-gutter-md">
+        <q-card flat>
+          <q-card-section>
+            <div v-if="isNew" class="text-h6">Add new word</div>
+            <div v-else class="text-h6">Edit {{ id }} word</div>
+          </q-card-section>
 
-        <q-card-section>
-          <q-select
-            label="Word1 *"
-            filled
-            v-model="word1"
-            use-input
-            use-chips
-            multiple
-            hide-dropdown-icon
-            input-debounce="0"
-            new-value-mode="add-unique"
-            :rules="[(val) => (!!val && val.length > 0) || 'Field is required']"
-          />
+          <q-card-section>
+            <q-select
+              label="Word1 *"
+              filled
+              v-model="word1"
+              use-input
+              use-chips
+              multiple
+              hide-dropdown-icon
+              input-debounce="0"
+              new-value-mode="add-unique"
+              :rules="[
+                (val) => (!!val && val.length > 0) || 'Field is required',
+              ]"
+            />
 
-          <q-select
-            label="Word2 *"
-            filled
-            v-model="word2"
-            use-input
-            use-chips
-            multiple
-            hide-dropdown-icon
-            input-debounce="0"
-            new-value-mode="add-unique"
-            :rules="[(val) => (!!val && val.length > 0) || 'Field is required']"
-          />
+            <q-select
+              label="Word2 *"
+              filled
+              v-model="word2"
+              use-input
+              use-chips
+              multiple
+              hide-dropdown-icon
+              input-debounce="0"
+              new-value-mode="add-unique"
+              :rules="[
+                (val) => (!!val && val.length > 0) || 'Field is required',
+              ]"
+            />
 
-          <q-checkbox v-model="isLearnedFlg" label="Learned" />
-        </q-card-section>
+            <q-checkbox v-model="isLearnedFlg" label="Learned" />
+          </q-card-section>
 
-        <q-card-actions>
-          <q-btn
-            type="submit"
-            class="q-ml-sm"
-            color="primary"
-            icon="save"
-            label="Save"
-          />
-          <q-btn
-            @click="() => cancel()"
-            outline
-            class="q-ml-sm"
-            color="primary"
-            icon="cancel"
-            label="Cancel"
-          />
-          <q-btn
-            @click="() => del()"
-            v-if="!isNew"
-            class="q-ml-sm"
-            color="negative"
-            icon="delete"
-            label="Delete"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-form>
-  </q-layout>
+          <q-card-actions>
+            <q-btn
+              type="submit"
+              class="q-ml-sm"
+              color="primary"
+              icon="save"
+              label="Save"
+            />
+            <q-btn
+              @click="() => cancel()"
+              outline
+              class="q-ml-sm"
+              color="primary"
+              icon="cancel"
+              label="Cancel"
+            />
+            <q-btn
+              @click="() => del()"
+              v-if="!isNew"
+              class="q-ml-sm"
+              color="negative"
+              icon="delete"
+              label="Delete"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-form>
+    </q-layout>
+  </q-page>
 </template>
 
 <script setup lang="ts">

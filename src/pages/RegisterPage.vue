@@ -1,10 +1,11 @@
 <template>
-  <q-layout
-    view="hHh Lpr lFf"
-    class="window-height window-width row justify-center items-center"
-  >
-    <q-form @submit.prevent="register" class="q-gutter-md">
-      <q-card class="" style="width: 400px">
+  <q-page class="window-height window-width row justify-center items-center">
+    <!-- <q-layout
+      view="hHh Lpr lFf"
+      class="window-height window-width row justify-center items-center"
+    > -->
+    <q-form @submit.prevent="register" class="login-form">
+      <q-card :flat="$q.platform.is.mobile">
         <q-card-section>
           <div class="text-h6">Registrarse</div>
           <div class="text-subtitle2">by bibenga</div>
@@ -47,25 +48,38 @@
             label="Password *"
             :rules="[(val) => !!val || 'Field is required']"
           />
-          <!-- <q-input
-            ref="codeRef"
-            clearable
-            outlined
-            v-model.trim="code"
-            label="Code *"
-            :rules="[(val) => !!val || 'Field is required']"
-          /> -->
         </q-card-section>
 
-        <q-separator />
+        <q-separator v-if="$q.platform.is.desktop" />
 
         <q-card-actions>
-          <q-btn label="Register" type="submit" icon="person" color="primary" />
+          <q-btn
+            label="Register"
+            type="submit"
+            class="login-btn"
+            color="primary"
+            icon="person"
+          />
         </q-card-actions>
       </q-card>
     </q-form>
-  </q-layout>
+    <!-- </q-layout> -->
+  </q-page>
 </template>
+
+<style>
+.mobile .login-form {
+  width: 100%;
+}
+
+.desktop .login-form {
+  width: 400px;
+}
+
+.mobile .login-btn {
+  width: 100%;
+}
+</style>
 
 <script setup lang="ts">
 import { inject, ref } from 'vue';

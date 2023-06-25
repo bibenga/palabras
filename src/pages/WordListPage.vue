@@ -1,21 +1,22 @@
 <template>
-  <q-layout view="hHh Lpr lFf">
-    <q-table
-      ref="tableRef"
-      title="Tus palabras para estudiar"
-      :rows="rows"
-      :columns="columns"
-      row-key="id"
-      selection="multiple"
-      v-model:selected="selected"
-      v-model:pagination="pagination"
-      :loading="loading"
-      :filter="filter"
-      binary-state-sort
-      @request="onRequest"
-      @row-click="(evt, row, index) => rowClicked(row)"
-    >
-      <!-- <template v-slot:top-right>
+  <q-page>
+    <q-layout view="hHh Lpr lFf">
+      <q-table
+        ref="tableRef"
+        title="Tus palabras para estudiar"
+        :rows="rows"
+        :columns="columns"
+        row-key="id"
+        selection="multiple"
+        v-model:selected="selected"
+        v-model:pagination="pagination"
+        :loading="loading"
+        :filter="filter"
+        binary-state-sort
+        @request="onRequest"
+        @row-click="(evt, row, index) => rowClicked(row)"
+      >
+        <!-- <template v-slot:top-right>
         <q-input
           borderless
           dense
@@ -29,31 +30,31 @@
         </q-input>
       </template> -->
 
-      <template v-slot:top>
-        <q-btn
-          @click="() => fakeAdd()"
-          class="q-ml-sm"
-          outline
-          color="primary"
-          label="Fake Add"
-          icon="add"
-        />
-        <q-btn
-          @click="() => add()"
-          class="q-ml-sm"
-          color="primary"
-          label="Add"
-          icon="add"
-        />
-        <q-btn
-          v-if="selected.length > 0"
-          @click="() => del()"
-          class="q-ml-sm"
-          icon="delete"
-          color="negative"
-          label="Delete selected"
-        />
-        <!-- <q-space />
+        <template v-slot:top>
+          <q-btn
+            @click="() => fakeAdd()"
+            class="q-ml-sm"
+            outline
+            color="primary"
+            label="Fake Add"
+            icon="add"
+          />
+          <q-btn
+            @click="() => add()"
+            class="q-ml-sm"
+            color="primary"
+            label="Add"
+            icon="add"
+          />
+          <q-btn
+            v-if="selected.length > 0"
+            @click="() => del()"
+            class="q-ml-sm"
+            icon="delete"
+            color="negative"
+            label="Delete selected"
+          />
+          <!-- <q-space />
         <q-input
           borderless
           dense
@@ -65,15 +66,15 @@
             <q-icon name="search" />
           </template>
         </q-input> -->
-      </template>
+        </template>
 
-      <template v-slot:body-cell-isLearnedFlg="props">
-        <q-td :props="props">
-          <q-checkbox v-model="props.row.isLearnedFlg" color="grey" disable />
-        </q-td>
-      </template>
+        <template v-slot:body-cell-isLearnedFlg="props">
+          <q-td :props="props">
+            <q-checkbox v-model="props.row.isLearnedFlg" color="grey" disable />
+          </q-td>
+        </template>
 
-      <!-- <template v-slot:header-selection="scope">
+        <!-- <template v-slot:header-selection="scope">
         <q-checkbox v-model="scope.selected" color="grey" />
       </template>
 
@@ -105,9 +106,9 @@
           </q-td>
         </q-tr>
       </template> -->
-    </q-table>
+      </q-table>
 
-    <!-- <q-btn
+      <!-- <q-btn
       @click="() => fakeAdd()"
       class="q-ml-sm"
       outline
@@ -130,7 +131,8 @@
       color="negative"
       label="Delete selected"
     /> -->
-  </q-layout>
+    </q-layout>
+  </q-page>
 </template>
 
 <script setup lang="ts">

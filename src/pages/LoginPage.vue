@@ -1,10 +1,11 @@
 <template>
-  <q-layout
-    view="hHh Lpr lFf"
-    class="window-height window-width row justify-center items-center"
-  >
-    <q-form @submit.prevent="login" class="q-gutter-md">
-      <q-card class="" style="width: 400px">
+  <q-page class="window-height window-width row justify-center items-center">
+    <!-- <q-layout
+      view="hHh Lpr lFf"
+      class="window-height window-width row justify-center items-center"
+    > -->
+    <q-form @submit.prevent="login" class="login-form">
+      <q-card :flat="$q.platform.is.mobile">
         <q-card-section>
           <div class="text-h6">Inicia sesión</div>
           <div class="text-subtitle2">by bibenga</div>
@@ -51,12 +52,20 @@
           />
         </q-card-section>
 
-        <q-separator />
+        <q-separator v-if="$q.platform.is.desktop" />
 
         <q-card-actions>
-          <q-btn label="Login" type="submit" color="primary" icon="mail" />
+          <q-btn
+            label="Login"
+            type="submit"
+            class="login-btn"
+            color="primary"
+            icon="mail"
+          />
+
           <q-btn
             label="Google"
+            class="login-btn"
             color="primary"
             icon="follow_the_signs"
             @click.prevent="() => loginWithGoogle()"
@@ -64,8 +73,25 @@
         </q-card-actions>
       </q-card>
     </q-form>
-  </q-layout>
+    <!-- </q-layout> -->
+  </q-page>
 </template>
+
+<style>
+.mobile .login-form {
+  width: 100%;
+}
+
+.desktop .login-form {
+  width: 400px;
+}
+
+.mobile .login-btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-left: 0px !important;
+}
+</style>
 
 <script setup lang="ts">
 import { inject, ref } from 'vue';
