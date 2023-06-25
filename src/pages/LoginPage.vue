@@ -6,7 +6,7 @@
     <q-form @submit.prevent="login" class="q-gutter-md">
       <q-card class="" style="width: 400px">
         <q-card-section>
-          <div class="text-h6">Iniciar sesión</div>
+          <div class="text-h6">Inicia sesión</div>
           <div class="text-subtitle2">by bibenga</div>
         </q-card-section>
 
@@ -54,7 +54,13 @@
         <q-separator />
 
         <q-card-actions>
-          <q-btn label="Login" type="submit" color="primary" />
+          <q-btn label="Login" type="submit" color="primary" icon="mail" />
+          <q-btn
+            label="Google"
+            color="primary"
+            icon="follow_the_signs"
+            @click.prevent="() => loginWithGoogle()"
+          />
         </q-card-actions>
       </q-card>
     </q-form>
@@ -65,7 +71,12 @@
 import { inject, ref } from 'vue';
 import { useQuasar, QInput, QSpinnerGears } from 'quasar';
 import { useRouter } from 'vue-router';
-import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  Auth,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from 'firebase/auth';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -82,9 +93,6 @@ const valid = ref<boolean>();
 const fireauth = inject<Auth>('fireauth');
 
 const login = async () => {
-  console.log(
-    `[LoginPage] login: username=${username.value}, password=${password.value}`
-  );
   $q.loading.show({
     spinner: QSpinnerGears,
     message: 'Logining...',
@@ -109,6 +117,46 @@ const login = async () => {
       console.log('error', error);
       errorMessage.value = error.message;
       $q.loading.hide();
+    });
+};
+
+const loginWithGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  // provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+  // provider.setCustomParameters({
+  //   login_hint: 'user@example.com',
+  // });
+  signInWithPopup(fireauth, provider)
+    .then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // IdP data available using getAdditionalUserInfo(result)
+      // ...
+
+      console.log('user', user);
+      const userName = user.displayName || user.email;
+      $q.notify({
+        type: 'positive',
+        message: `Welcome ${userName}!`,
+        timeout: 1000,
+      });
+      router.push('/');
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+      console.log('error', error);
+      console.log('credential', credential);
+      errorMessage.value = error.message;
     });
 };
 </script>

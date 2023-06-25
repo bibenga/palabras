@@ -60,7 +60,7 @@
         <q-separator />
 
         <q-card-actions>
-          <q-btn label="Register" type="submit" color="primary" />
+          <q-btn label="Register" type="submit" icon="person" color="primary" />
         </q-card-actions>
       </q-card>
     </q-form>

@@ -10,6 +10,8 @@ export default boot(({ app, router }) => {
     const firebase = initializeApp(firebaseConfig);
     const firestore = getFirestore(firebase);
     const fireauth = getAuth(firebase);
+    fireauth.useDeviceLanguage();
+
     console.log('firebase', firebase);
     console.log('firestore', firestore);
     console.log('fireauth', fireauth);
