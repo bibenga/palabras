@@ -1,9 +1,5 @@
 <template>
-  <q-page class="window-height window-width row justify-center items-center">
-    <!-- <q-layout
-      view="hHh Lpr lFf"
-      class="window-height window-width row justify-center items-center"
-    > -->
+  <q-page class="row justify-center items-center">
     <q-form @submit.prevent="register" class="login-form">
       <q-card :flat="$q.platform.is.mobile">
         <q-card-section>
@@ -63,7 +59,6 @@
         </q-card-actions>
       </q-card>
     </q-form>
-    <!-- </q-layout> -->
   </q-page>
 </template>
 
