@@ -10,7 +10,7 @@
         <q-card-section>
           <q-tabs narrow-indicator>
             <q-route-tab
-              label="Iniciar sesión"
+              label="Inicia sesión"
               name="login"
               to="/login"
             ></q-route-tab>
