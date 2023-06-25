@@ -1,4 +1,4 @@
-<template v-if="authLoading">
+<template>
   <q-layout view="hHh Lpr lFf">
     <q-header>
       <q-toolbar>
@@ -32,7 +32,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
+    <q-page-container v-if="authLoaded">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -54,10 +54,10 @@ const { isAuthenticated, user } = useAuth(fireauth);
 //   console.log(`[App.onBeforeRouteUpdate] ${from.fullPath} -> ${to.fullPath}`);
 //   return false;
 // });
-const authLoading = ref(true);
+const authLoaded = ref(false);
 onAuthStateChanged(fireauth, (a) => {
   console.log('onAuthStateChanged', a);
-  authLoading.value = true;
+  authLoaded.value = true;
 });
 
 function logout() {

@@ -71,7 +71,12 @@
 
       <template v-slot:body-cell-isLearnedFlg="props">
         <q-td :props="props">
-          <q-checkbox v-model="props.row.isLearnedFlg" color="grey" disable />
+          <q-icon
+            :name="
+              props.row.isLearnedFlg ? 'check_box' : 'check_box_outline_blank'
+            "
+            size="1.5em"
+          />
         </q-td>
       </template>
 
