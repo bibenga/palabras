@@ -20,6 +20,10 @@ const routes: RouteRecordRaw[] = [
         props: true,
         component: () => import('pages/WordEditPage.vue'),
       },
+      {
+        path: 'learn',
+        component: () => import('pages/WordLearnPage.vue'),
+      },
     ],
   },
 
