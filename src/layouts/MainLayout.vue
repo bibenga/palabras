@@ -29,12 +29,32 @@
             <q-tooltip class="bg-accent">Logout</q-tooltip>
           </q-btn>
         </template>
+        <template v-else>
+          <q-btn stretch flat icon="login" to="/login">
+            <q-tooltip class="bg-accent">Login</q-tooltip>
+          </q-btn>
+        </template>
       </q-toolbar>
     </q-header>
 
     <q-page-container v-if="authLoaded">
       <router-view />
     </q-page-container>
+
+    <q-footer v-if="isAcceptedCookieConsent">
+      <q-banner dense inline-actions class="text-white bg-red">
+        This website uses cookies to improve your experience. We'll assume
+        you're ok with this, but you can opt-out if you wish.
+        <template v-slot:action>
+          <q-btn
+            flat
+            color="white"
+            label="Accept"
+            @click="() => setCookieConsent()"
+          />
+        </template>
+      </q-banner>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -42,7 +62,7 @@
 import { useAuth } from '@vueuse/firebase';
 import { Auth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useQuasar } from 'quasar';
-import { inject, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
@@ -83,4 +103,12 @@ function logout() {
       });
   });
 }
+
+const isAcceptedCookieConsent = ref(
+  $q.localStorage.getItem('AcceptedCookieConsent') === true
+);
+const setCookieConsent = () => {
+  $q.localStorage.set('AcceptedCookieConsent', true);
+  isAcceptedCookieConsent.value = true;
+};
 </script>

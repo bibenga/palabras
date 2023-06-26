@@ -1,5 +1,7 @@
 <template>
-  <q-page class="row justify-center items-center">
+  <q-page
+    :class="$q.platform.is.mobile ? '' : 'row justify-center items-center'"
+  >
     <q-form @submit.prevent="login" class="login-form">
       <q-card :flat="$q.platform.is.mobile">
         <q-card-section>
