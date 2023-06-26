@@ -62,7 +62,7 @@
 import { useAuth } from '@vueuse/firebase';
 import { Auth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useQuasar } from 'quasar';
-import { computed, inject, ref } from 'vue';
+import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
@@ -75,8 +75,13 @@ const { isAuthenticated, user } = useAuth(fireauth);
 //   return false;
 // });
 const authLoaded = ref(false);
-onAuthStateChanged(fireauth, (a) => {
-  console.log('onAuthStateChanged', a);
+// console.log('[auth] currentUser', fireauth.currentUser);
+onAuthStateChanged(fireauth, (user) => {
+  if (user) {
+    console.log('[layout.auth] logged in', user);
+  } else {
+    console.log('[layout.auth] logged out');
+  }
   authLoaded.value = true;
 });
 
