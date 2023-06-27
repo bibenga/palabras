@@ -75,6 +75,7 @@
 
 <script setup lang="ts">
 import { useAuth } from '@vueuse/firebase';
+import { M } from 'app/dist/spa/assets/index.esm2017.d6d94de5';
 import { Auth } from 'firebase/auth';
 import {
   Firestore,
@@ -151,6 +152,7 @@ const save = async () => {
       word1: word1.value,
       word2: word2.value,
       isLearnedFlg: isLearnedFlg.value,
+      random: Math.random(),
     };
     console.log('try add', word);
     const aword = await addDoc(collection(firestore, 'words'), word);

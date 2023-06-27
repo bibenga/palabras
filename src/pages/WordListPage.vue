@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth, useFirestore } from '@vueuse/firebase';
+import { useAuth } from '@vueuse/firebase';
 import { Auth } from 'firebase/auth';
 import { query } from 'firebase/database';
 import {
@@ -310,6 +310,7 @@ const fakeAdd = async () => {
     word1: ['Hola'],
     word2: ['Hello'],
     isLearnedFlg: false,
+    random: Math.random(),
   };
   console.log('try add', word);
   const aword = await addDoc(collection(firestore, 'words'), word);
