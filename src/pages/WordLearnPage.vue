@@ -42,6 +42,8 @@
             filled
             autogrow
             autofocus
+            :readonly="answerIsValid"
+            :error="answerIsValid !== undefined && !answerIsValid"
           />
         </div>
       </q-card-section>
@@ -54,9 +56,9 @@
           label="Entregar"
           color="primary"
         />
-
-        <q-btn @click="() => skipTask()" class="q-ml-sm" label="Siguiente" />
-        <q-btn @click="() => markAsKnowed()" class="q-ml-sm" label="¡Lo sé!" />
+        <q-space />
+        <q-btn @click="() => skipTask()" label="Siguiente" />
+        <q-btn @click="() => markAsKnowed()" label="¡Lo sé!" />
       </q-card-actions>
     </q-card>
   </q-page>
@@ -81,6 +83,8 @@ import {
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
 import { inject, ref } from 'vue';
+import deburr from 'lodash/deburr';
+import isEqual from 'lodash/isEqual';
 
 const $q = useQuasar();
 
@@ -91,6 +95,7 @@ const { user } = useAuth(fireauth);
 const task = ref();
 const answerControl = ref();
 const answer = ref('');
+const answerIsValid = ref<boolean>();
 const rankDebug = ref();
 const selectedDebug = ref();
 const load = async () => {
@@ -196,6 +201,7 @@ const load = async () => {
     });
   }
   answer.value = '';
+  answerIsValid.value = undefined;
 };
 load();
 
@@ -230,7 +236,33 @@ const markAsKnowed = async () => {
 };
 
 const validateAnswer = async () => {
-  console.log('validateAnswer', answer.value);
-  answerControl.value.focus();
+  if (answerIsValid.value) {
+    await setDoc(
+      doc(firestore, 'tasks', task.value.id),
+      { isDoneFlg: true },
+      { merge: true }
+    );
+    await load();
+    return;
+  }
+
+  const splitRule = /[ \r\n¡!¿?.,:;'\"]+/;
+  // const convert = (s: string) => s.toLowerCase().normalize('NFKD').split(splitRule);
+  const convert = (s: string) => deburr(s.toLowerCase()).split(splitRule);
+  const aAnswer = convert(answer.value);
+  let valid = false;
+  for (const word2 of task.value.word2) {
+    const aWord2 = convert(word2);
+    valid = isEqual(aAnswer, aWord2);
+    console.debug(aAnswer, '===', aWord2, '->', valid);
+    if (valid) {
+      break;
+    }
+  }
+
+  answerIsValid.value = valid;
+  if (!valid) {
+    answerControl.value.focus();
+  }
 };
 </script>

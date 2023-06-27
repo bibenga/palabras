@@ -177,9 +177,11 @@ const save = async () => {
   }
   router.push('/word');
 };
+
 const cancel = async () => {
   router.push('/word');
 };
+
 const del = async () => {
   $q.dialog({
     title: 'Confirmation',
