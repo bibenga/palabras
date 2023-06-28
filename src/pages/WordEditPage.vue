@@ -74,8 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '@vueuse/firebase';
-import { Auth } from 'firebase/auth';
 import {
   Firestore,
   addDoc,
@@ -88,12 +86,12 @@ import {
 import { QSpinnerGears, useQuasar } from 'quasar';
 import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
-const fireauth = inject<Auth>('fireauth');
 const firestore = inject<Firestore>('firestore');
-const { user } = useAuth(fireauth);
+const user = useCurrentUser();
 
 const props = defineProps<{
   id: string;

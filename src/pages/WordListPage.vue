@@ -103,15 +103,15 @@ import {
   endBefore,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, onMounted, ref, watch } from 'vue';
+import { inject, onMounted, ref } from 'vue';
+import { useCurrentUser } from 'vuefire';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const router = useRouter();
-
-const fireauth = inject<Auth>('fireauth');
 const firestore = inject<Firestore>('firestore');
-const { isAuthenticated, user } = useAuth(fireauth);
+
+const user = useCurrentUser();
 
 const pagination = ref({
   sortBy: 'desc',
@@ -161,7 +161,7 @@ const onRequest = async (props) => {
   const filter = props.filter;
 
   console.log(
-    `onRequest: isAuthenticated=${isAuthenticated.value}; user=${user.value?.uid}; ` +
+    `onRequest: user=${user.value?.uid}; ` +
       `page=${page}; rowsPerPage=${rowsPerPage}; sortBy=${sortBy}; descending=${descending}; filter=${filter}; `
   );
 
@@ -236,13 +236,7 @@ const onRequest = async (props) => {
 };
 
 onMounted(() => {
-  if (!isAuthenticated.value) {
-    watch(isAuthenticated, () => {
-      tableRef.value.requestServerInteraction();
-    });
-  } else {
-    tableRef.value.requestServerInteraction();
-  }
+  tableRef.value.requestServerInteraction();
 });
 
 const loadDemoData = async () => {

@@ -14,15 +14,18 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'word',
         component: () => import('pages/WordListPage.vue'),
+        meta: { requiresAuth: true },
       },
       {
         path: 'word/:id',
         props: true,
         component: () => import('pages/WordEditPage.vue'),
+        meta: { requiresAuth: true },
       },
       {
         path: 'learn',
         component: () => import('pages/WordLearnPage.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },

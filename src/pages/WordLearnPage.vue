@@ -1,5 +1,5 @@
 <template>
-  <q-page v-if="isAuthenticated" class="row justify-center items-center">
+  <q-page class="row justify-center items-center">
     <q-card :flat="$q.platform.is.mobile">
       <q-card-section>
         <div class="text-h6">Prueba</div>
@@ -74,8 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '@vueuse/firebase';
-import { Auth } from 'firebase/auth';
 import {
   DocumentData,
   Firestore,
@@ -91,15 +89,15 @@ import {
   where,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, onActivated, onMounted, ref } from 'vue';
+import { inject, ref } from 'vue';
+import { useCurrentUser } from 'vuefire';
 import deburr from 'lodash/deburr';
 import isEqual from 'lodash/isEqual';
 
 const $q = useQuasar();
-
-const fireauth = inject<Auth>('fireauth');
 const firestore = inject<Firestore>('firestore');
-const { isAuthenticated, user } = useAuth(fireauth);
+
+const user = useCurrentUser();
 
 const task = ref();
 const answerControl = ref();
@@ -107,6 +105,7 @@ const answer = ref('');
 const answerIsValid = ref<boolean>();
 const rankDebug = ref();
 const selectedDebug = ref();
+
 const load = async () => {
   const cTasks = collection(firestore, 'tasks');
   const qTasks = query(

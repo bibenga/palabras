@@ -91,18 +91,20 @@
 </style>
 
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import { useQuasar, QInput, QSpinnerGears } from 'quasar';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {
   Auth,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth';
+import { getCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 
 const errorMessage = ref('');
 const usernameRef = ref<QInput>();
@@ -114,6 +116,22 @@ const password = ref<string>('9B725739-9470-4237-8A75-0B2391BAA4C6');
 const valid = ref<boolean>();
 
 const fireauth = inject<Auth>('fireauth');
+
+const redirectOnLogin = () => {
+  const to =
+    route.query.redirect && typeof route.query.redirect === 'string'
+      ? route.query.redirect
+      : '/';
+  console.debug(`redirect to ${to}`);
+  router.push(to);
+};
+
+onMounted(async () => {
+  const currentUser = await getCurrentUser();
+  if (currentUser) {
+    redirectOnLogin();
+  }
+});
 
 const login = async () => {
   $q.loading.show({
@@ -134,7 +152,7 @@ const login = async () => {
       });
 
       $q.loading.hide();
-      router.push('/');
+      redirectOnLogin();
     })
     .catch((error) => {
       console.log('error', error);
@@ -165,7 +183,7 @@ const loginWithGoogle = async () => {
         message: `Welcome ${userName}!`,
         timeout: 1000,
       });
-      router.push('/');
+      redirectOnLogin();
     })
     .catch((error) => {
       // const errorCode = error.code;

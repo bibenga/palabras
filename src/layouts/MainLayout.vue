@@ -18,7 +18,7 @@
           <q-tooltip class="bg-accent">Dark or ligt mode</q-tooltip>
         </q-btn>
 
-        <template v-if="isAuthenticated">
+        <template v-if="user">
           <q-tabs v-if="!$q.platform.is.mobile" class="bg-primary text-white">
             <q-route-tab name="learn" icon="school" to="/learn">
               <q-tooltip class="bg-accent">Learn words</q-tooltip>
@@ -80,21 +80,16 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '@vueuse/firebase';
 import { Auth, signOut } from 'firebase/auth';
 import { useQuasar } from 'quasar';
 import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
 const fireauth = inject<Auth>('fireauth');
-const { isAuthenticated, user } = useAuth(fireauth);
-
-// onBeforeRouteUpdate((to, from) => {
-//   console.log(`[App.onBeforeRouteUpdate] ${from.fullPath} -> ${to.fullPath}`);
-//   return false;
-// });
+const user = useCurrentUser();
 
 function logout() {
   $q.dialog({
@@ -115,7 +110,7 @@ function logout() {
           message: `Goodby ${userName}!`,
           timeout: 1000,
         });
-        router.push({ path: '/login' });
+        router.push({ path: '/' });
       });
   });
 }

@@ -1,9 +1,9 @@
 import { boot } from 'quasar/wrappers';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Firestore, getFirestore } from 'firebase/firestore';
-import { Auth, User, getAuth } from 'firebase/auth';
-import { Ref, inject, ref } from 'vue';
+import { Auth, getAuth } from 'firebase/auth';
 import firebaseConfig from './firebase.json';
+import { VueFire, VueFireAuth, getCurrentUser } from 'vuefire';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -13,7 +13,7 @@ declare module '@vue/runtime-core' {
   }
 }
 
-export default boot(async ({ app }) => {
+export default boot(async ({ app, router }) => {
   const firebase = initializeApp(firebaseConfig);
   console.debug('firebase', firebase);
 
@@ -31,38 +31,27 @@ export default boot(async ({ app }) => {
   app.provide('firebase', firebase);
   app.provide('firestore', firestore);
   app.provide('fireauth', fireauth);
-});
 
-const useAuth = (): {
-  fireauth: Auth;
-  isReady: Ref<boolean>;
-  isAuthenticated: Ref<boolean>;
-  user: Ref<User | null | undefined>;
-} => {
-  const fireauth = inject<Auth>('fireauth');
-  if (fireauth == undefined) {
-    throw new Error('the fireauth is not defined.');
-  }
-
-  const user = ref<User | null>();
-  const isReady = ref(false);
-  const isAuthenticated = ref(false);
-  fireauth.onAuthStateChanged((authUser) => {
-    console.debug('user ->', authUser);
-    isReady.value = true;
-    isAuthenticated.value = authUser != null;
-    user.value = authUser;
+  app.use(VueFire, {
+    firebaseApp: firebase,
+    modules: [VueFireAuth()],
   });
 
-  return { fireauth, isReady, isAuthenticated, user };
-};
-
-const useFirestore = (): Firestore => {
-  const firestore = inject<Firestore>('firestore');
-  if (firestore == undefined) {
-    throw new Error('a firestore is not defined.');
-  }
-  return firestore;
-};
-
-export { useAuth, useFirestore };
+  router.beforeEach(async (to) => {
+    // routes with `meta: { requiresAuth: true }` will check for the users, others won't
+    if (to.meta.requiresAuth) {
+      const currentUser = await getCurrentUser();
+      // if the user is not logged in, redirect to the login page
+      if (!currentUser) {
+        return {
+          path: '/login',
+          query: {
+            // we keep the current path in the query so we can redirect to it after login
+            // with `router.push(route.query.redirect || '/')`
+            redirect: to.fullPath,
+          },
+        };
+      }
+    }
+  });
+});
