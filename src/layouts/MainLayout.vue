@@ -40,7 +40,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container v-if="authLoaded">
+    <q-page-container>
       <router-view />
     </q-page-container>
 
@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { useAuth } from '@vueuse/firebase';
-import { Auth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { Auth, signOut } from 'firebase/auth';
 import { useQuasar } from 'quasar';
 import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -95,16 +95,6 @@ const { isAuthenticated, user } = useAuth(fireauth);
 //   console.log(`[App.onBeforeRouteUpdate] ${from.fullPath} -> ${to.fullPath}`);
 //   return false;
 // });
-const authLoaded = ref(false);
-// console.log('[auth] currentUser', fireauth.currentUser);
-onAuthStateChanged(fireauth, (user) => {
-  if (user) {
-    console.log('[layout.auth] logged in', user);
-  } else {
-    console.log('[layout.auth] logged out');
-  }
-  authLoaded.value = true;
-});
 
 function logout() {
   $q.dialog({

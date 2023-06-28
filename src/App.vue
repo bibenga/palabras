@@ -1,20 +1,21 @@
 <template>
-  <router-view v-if="isAuthReady" />
+  <router-view v-if="isReady" />
 </template>
 
 <script setup lang="ts">
 import { onAuthStateChanged } from 'firebase/auth';
 import { useAuth } from './boot/firebase';
-import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-const fireauth = useAuth();
-const isAuthReady = ref(false);
+const router = useRouter();
+const route = useRoute();
+
+const { fireauth, isReady } = useAuth();
 onAuthStateChanged(fireauth, (user) => {
-  isAuthReady.value = true;
-  if (user) {
-    console.log('[app.auth] logged in', user);
-  } else {
-    console.log('[app.auth] logged out');
+  if (user == null) {
+    if (!route.path.startsWith('/login')) {
+      router.push({ path: '/login' });
+    }
   }
 });
 </script>

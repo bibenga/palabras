@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row justify-center items-center">
+  <q-page v-if="isAuthenticated" class="row justify-center items-center">
     <q-card :flat="$q.platform.is.mobile">
       <q-card-section>
         <div class="text-h6">Prueba</div>
@@ -91,7 +91,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, ref } from 'vue';
+import { inject, onActivated, onMounted, ref } from 'vue';
 import deburr from 'lodash/deburr';
 import isEqual from 'lodash/isEqual';
 
@@ -99,7 +99,7 @@ const $q = useQuasar();
 
 const fireauth = inject<Auth>('fireauth');
 const firestore = inject<Firestore>('firestore');
-const { user } = useAuth(fireauth);
+const { isAuthenticated, user } = useAuth(fireauth);
 
 const task = ref();
 const answerControl = ref();
@@ -173,7 +173,6 @@ const load = async () => {
         word2: word2,
         isDoneFlg: false,
         isSkipedFlg: false,
-        debug: { random: sWord.data().random, rank: rank },
       };
       selectedDebug.value = sWords.docs[0].data().random;
       console.log('add', newTask);

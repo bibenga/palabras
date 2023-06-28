@@ -1,8 +1,8 @@
 import { boot } from 'quasar/wrappers';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Firestore, getFirestore } from 'firebase/firestore';
-import { Auth, getAuth } from 'firebase/auth';
-import { inject } from 'vue';
+import { Auth, User, getAuth } from 'firebase/auth';
+import { Ref, inject, ref } from 'vue';
 import firebaseConfig from './firebase.json';
 
 declare module '@vue/runtime-core' {
@@ -13,7 +13,7 @@ declare module '@vue/runtime-core' {
   }
 }
 
-export default boot(({ app }) => {
+export default boot(async ({ app }) => {
   const firebase = initializeApp(firebaseConfig);
   console.debug('firebase', firebase);
 
@@ -33,27 +33,28 @@ export default boot(({ app }) => {
   app.provide('fireauth', fireauth);
 });
 
-const useAuth = (): Auth => {
+const useAuth = (): {
+  fireauth: Auth;
+  isReady: Ref<boolean>;
+  isAuthenticated: Ref<boolean>;
+  user: Ref<User | null | undefined>;
+} => {
   const fireauth = inject<Auth>('fireauth');
   if (fireauth == undefined) {
-    throw new Error('a fireauth is not defined.');
+    throw new Error('the fireauth is not defined.');
   }
 
-  // const isAuthenticationReady = ref(false);
-  // const isAuthenticated = ref(false);
-  // const user = ref<User | null>();
-  // onAuthStateChanged(fireauth, (newUser) => {
-  //   isAuthenticationReady.value = true;
-  //   isAuthenticated.value = newUser != null;
-  //   user.value = newUser;
-  //   if (newUser) {
-  //     console.log('[app.auth] logged in', user);
-  //   } else {
-  //     console.log('[app.auth] logged out');
-  //   }
-  // });
+  const user = ref<User | null>();
+  const isReady = ref(false);
+  const isAuthenticated = ref(false);
+  fireauth.onAuthStateChanged((authUser) => {
+    console.debug('user ->', authUser);
+    isReady.value = true;
+    isAuthenticated.value = authUser != null;
+    user.value = authUser;
+  });
 
-  return fireauth;
+  return { fireauth, isReady, isAuthenticated, user };
 };
 
 const useFirestore = (): Firestore => {
