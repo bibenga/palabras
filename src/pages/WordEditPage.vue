@@ -86,7 +86,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { QSpinnerGears, useQuasar } from 'quasar';
-import { inject, mergeProps, ref } from 'vue';
+import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
