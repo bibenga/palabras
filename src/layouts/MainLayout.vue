@@ -19,7 +19,7 @@
         </q-btn>
 
         <template v-if="isAuthenticated">
-          <q-tabs class="bg-primary text-white">
+          <q-tabs v-if="!$q.platform.is.mobile" class="bg-primary text-white">
             <q-route-tab name="learn" icon="school" to="/learn">
               <q-tooltip class="bg-accent">Learn words</q-tooltip>
             </q-route-tab>
@@ -44,8 +44,16 @@
       <router-view />
     </q-page-container>
 
-    <q-footer v-if="isAcceptedCookieConsent">
-      <q-banner dense inline-actions class="text-white bg-red">
+    <q-footer
+      v-if="!isAcceptedCookieConsent || $q.platform.is.mobile"
+      class="fixed-bottom"
+    >
+      <q-banner
+        v-if="!isAcceptedCookieConsent"
+        dense
+        inline-actions
+        class="text-white bg-red"
+      >
         This website uses cookies to improve your experience. We'll assume
         you're ok with this, but you can opt-out if you wish.
         <template v-slot:action>
@@ -57,6 +65,16 @@
           />
         </template>
       </q-banner>
+      <q-toolbar v-if="$q.platform.is.mobile">
+        <q-tabs class="bg-primary text-white">
+          <q-route-tab name="learn" icon="school" to="/learn">
+            <q-tooltip class="bg-accent">Learn words</q-tooltip>
+          </q-route-tab>
+          <q-route-tab name="word" icon="view_list" to="/word">
+            <q-tooltip class="bg-accent">Add or remove words</q-tooltip>
+          </q-route-tab>
+        </q-tabs>
+      </q-toolbar>
     </q-footer>
   </q-layout>
 </template>
