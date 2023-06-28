@@ -39,7 +39,7 @@
               ]"
             />
 
-            <q-checkbox v-model="isLearnedFlg" label="Learned" />
+            <q-toggle v-model="isLearnedFlg" label="Learned" />
           </q-card-section>
 
           <q-card-actions>
@@ -75,7 +75,6 @@
 
 <script setup lang="ts">
 import { useAuth } from '@vueuse/firebase';
-import { M } from 'app/dist/spa/assets/index.esm2017.d6d94de5';
 import { Auth } from 'firebase/auth';
 import {
   Firestore,

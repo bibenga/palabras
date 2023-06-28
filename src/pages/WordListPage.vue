@@ -4,7 +4,7 @@
     <q-table
       ref="tableRef"
       title="Tus palabras para estudiar"
-      flat
+      :grid="$q.platform.is.mobile"
       :rows="rows"
       :columns="columns"
       row-key="id"
@@ -202,6 +202,8 @@ const columns = [
     required: true,
     label: 'Is Learned',
     align: 'center',
+    field: (row) => row.isLearnedFlg,
+    format: (val) => (val ? 'yes' : 'no'),
   },
   { name: 'actions', required: true, label: '', align: 'left' },
 ];
