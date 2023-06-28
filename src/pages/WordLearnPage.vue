@@ -54,9 +54,16 @@
 
       <q-card-actions>
         <q-btn
+          v-if="!answerIsValid"
           @click="() => validateAnswer()"
           label="Entregar"
           color="primary"
+        />
+        <q-btn
+          v-if="answerIsValid"
+          @click="() => validateAnswer()"
+          label="Claro"
+          color="secondary"
         />
         <q-space />
         <q-btn @click="() => skipTask()" label="Siguiente" />
