@@ -1,6 +1,5 @@
 <template>
   <q-page>
-    <!-- <q-layout view="hHh Lpr lFf"> -->
     <q-table
       ref="tableRef"
       title="Tus palabras para estudiar"
@@ -33,11 +32,11 @@
 
       <template v-slot:top>
         <q-btn
-          @click="() => fakeAdd()"
+          @click="() => loadDemoData()"
           class="q-ml-sm"
           outline
           color="primary"
-          label="Fake Add"
+          label="Add demo data"
           icon="add"
         />
         <q-btn
@@ -79,65 +78,7 @@
           />
         </q-td>
       </template>
-
-      <!-- <template v-slot:header-selection="scope">
-        <q-checkbox v-model="scope.selected" color="grey" />
-      </template>
-
-      <template v-slot:body="props">
-        <q-tr :props="props" :on-click="() => rowClicked(props)">
-          <q-td key="check-id">
-            <q-checkbox v-model="props.selected" color="grey" />
-          </q-td>
-          <q-td key="id" :props="props">
-            {{ props.row.id }}
-          </q-td>
-          <q-td key="word1" :props="props">
-            {{ props.row.word1?.join(', ') }}
-          </q-td>
-          <q-td key="word2" :props="props">
-            {{ props.row.word2?.join(', ') }}
-          </q-td>
-          <q-td key="isLearnedFlg" :props="props">
-            <q-checkbox v-model="props.row.isLearnedFlg" color="grey" disable />
-          </q-td>
-          <q-td key="actions" :props="props">
-            <q-btn
-              @click="() => edit(props.row)"
-              flat
-              round
-              color="primary"
-              icon="edit"
-            />
-          </q-td>
-        </q-tr>
-      </template> -->
     </q-table>
-
-    <!-- <q-btn
-      @click="() => fakeAdd()"
-      class="q-ml-sm"
-      outline
-      color="primary"
-      label="Fake Add"
-      icon="add"
-    />
-    <q-btn
-      @click="() => add()"
-      class="q-ml-sm"
-      color="primary"
-      label="Add"
-      icon="add"
-    />
-    <q-btn
-      v-if="selected.length > 0"
-      @click="() => del()"
-      class="q-ml-sm"
-      icon="delete"
-      color="negative"
-      label="Delete selected"
-    /> -->
-    <!-- </q-layout> -->
   </q-page>
 </template>
 
@@ -304,26 +245,50 @@ onMounted(() => {
   }
 });
 
-const fakeAdd = async () => {
-  console.log('add');
-  const word = {
-    userId: user.value?.uid,
-    createdTs: new Date(),
-    word1: ['Hola'],
-    word2: ['Hello'],
-    isLearnedFlg: false,
-    random: Math.random(),
-  };
-  console.log('try add', word);
-  const aword = await addDoc(collection(firestore, 'words'), word);
-  console.log('added', aword);
-  $q.notify({
-    message: `The document ${aword.id} was added`,
-    timeout: 2000,
-  });
-  pagination.value.rowsNumber = 0;
-  rowsSnapshot.value = null;
-  tableRef.value.requestServerInteraction();
+const loadDemoData = async () => {
+  console.log('fakeAdd');
+
+  $q.loading.show();
+  try {
+    const demoPairs = [
+      [['decir'], ['сказать', 'говорить']],
+      [
+        ['empezar', 'comenzar'],
+        ['начать', 'начинать'],
+      ],
+      [['dar'], ['давать']],
+      [['volver'], ['возвращаться']],
+      [['abrir'], ['открывать']],
+      [['cerrar'], ['закрыть']],
+      [['contar'], ['считать']],
+      [['encontrar'], ['находить']],
+      [['contestar'], ['отвечать']],
+      [['Nadie'], ['Ни кто']],
+      [['Nada'], ['Ни что', 'Ничего']],
+    ];
+    for (const pair of demoPairs) {
+      const word = {
+        userId: user.value?.uid,
+        createdTs: new Date(),
+        word1: pair[0].map((v) => v.toLowerCase()),
+        word2: pair[1].map((v) => v.toLowerCase()),
+        isLearnedFlg: false,
+        random: Math.random(),
+      };
+      const aword = await addDoc(collection(firestore, 'words'), word);
+      console.log('added', word, aword);
+      $q.loadingBar.increment(1);
+    }
+    $q.notify({
+      message: `Was added ${demoPairs.length} word pair`,
+      timeout: 2000,
+    });
+    pagination.value.rowsNumber = 0;
+    rowsSnapshot.value = null;
+    tableRef.value.requestServerInteraction();
+  } finally {
+    $q.loading.hide();
+  }
 };
 
 const add = async () => {
@@ -348,18 +313,33 @@ const del = async () => {
     cancel: true,
     focus: 'cancel',
   }).onOk(async () => {
-    for (const d of docs) {
-      console.log('del doc', d);
-      await deleteDoc(doc(firestore, 'words', d.id));
-      $q.notify({
-        message: `The document ${d.id} was deleted`,
-        timeout: 2000,
-      });
+    $q.loading.show();
+    try {
+      const docsLength = docs.length;
+      for (const d of docs) {
+        console.log('del doc', d);
+        await deleteDoc(doc(firestore, 'words', d.id));
+        if (docsLength < 5) {
+          $q.notify({
+            message: `The document ${d.id} was deleted`,
+            timeout: 2000,
+          });
+        }
+      }
+      if (docsLength >= 5) {
+        $q.notify({
+          message: `Deleted ${docsLength} documents`,
+          timeout: 2000,
+        });
+      }
+
+      selected.value = [];
+      pagination.value.rowsNumber = 0;
+      rowsSnapshot.value = null;
+      tableRef.value.requestServerInteraction();
+    } finally {
+      $q.loading.hide();
     }
-    selected.value = [];
-    pagination.value.rowsNumber = 0;
-    rowsSnapshot.value = null;
-    tableRef.value.requestServerInteraction();
   });
 };
 </script>

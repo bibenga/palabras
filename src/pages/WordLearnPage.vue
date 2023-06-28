@@ -22,6 +22,7 @@
             <span
               style="
                 cursor: default;
+                font-size: 1.5em;
                 text-decoration-line: underline;
                 text-decoration-style: dotted;
               "
@@ -38,6 +39,7 @@
           <q-input
             ref="answerControl"
             v-model.trim="answer"
+            style="font-size: 1.5em"
             @keydown.enter.prevent="validateAnswer"
             filled
             autogrow
