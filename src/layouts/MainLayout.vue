@@ -20,6 +20,9 @@
 
         <template v-if="user">
           <q-tabs v-if="!$q.platform.is.mobile" class="bg-primary text-white">
+            <q-route-tab name="progress" icon="dashboard" to="/progress">
+              <q-tooltip class="bg-accent">Progress</q-tooltip>
+            </q-route-tab>
             <q-route-tab name="learn" icon="school" to="/learn">
               <q-tooltip class="bg-accent">Learn words</q-tooltip>
             </q-route-tab>
@@ -67,6 +70,9 @@
       </q-banner>
       <q-toolbar v-if="$q.platform.is.mobile">
         <q-tabs class="bg-primary text-white">
+          <q-route-tab name="progress" icon="dashboard" to="/progress">
+            <q-tooltip class="bg-accent">Progress</q-tooltip>
+          </q-route-tab>
           <q-route-tab name="learn" icon="school" to="/learn">
             <q-tooltip class="bg-accent">Learn words</q-tooltip>
           </q-route-tab>

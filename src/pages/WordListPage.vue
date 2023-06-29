@@ -83,8 +83,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '@vueuse/firebase';
-import { Auth } from 'firebase/auth';
 import { query } from 'firebase/database';
 import {
   Firestore,

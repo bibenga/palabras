@@ -89,7 +89,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import { useCurrentUser } from 'vuefire';
 import deburr from 'lodash/deburr';
 import isEqual from 'lodash/isEqual';
@@ -210,7 +210,9 @@ const load = async () => {
   answer.value = '';
   answerIsValid.value = undefined;
 };
-load();
+onMounted(() => {
+  load();
+});
 
 const skipTask = async () => {
   console.log('skipTask', task.value.id);

@@ -84,7 +84,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { QSpinnerGears, useQuasar } from 'quasar';
-import { inject, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCurrentUser } from 'vuefire';
 
@@ -137,7 +137,9 @@ const load = async () => {
     docRef.value = {};
   }
 };
-load();
+onMounted(() => {
+  load();
+});
 
 const save = async () => {
   console.log(`new: ${word1.value}; ${word2.value}; ${isLearnedFlg.value}`);
