@@ -60,13 +60,13 @@
           color="primary"
         />
         <q-btn
-          v-if="answerIsValid"
+          v-else
           @click="() => validateAnswer()"
-          label="Claro"
+          label="Siguiente"
           color="secondary"
         />
         <q-space />
-        <q-btn @click="() => skipTask()" label="Siguiente" />
+        <q-btn @click="() => skipTask()" label="Saltar" />
         <q-btn @click="() => markAsKnowed()" label="¡Lo sé!" />
       </q-card-actions>
     </q-card>
