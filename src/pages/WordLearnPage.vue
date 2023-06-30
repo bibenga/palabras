@@ -2,7 +2,7 @@
   <q-page
     :class="$q.platform.is.mobile ? '' : 'row justify-center items-center'"
   >
-    <q-card :flat="$q.platform.is.mobile" class="learn-form">
+    <q-card flat :bordered="!$q.platform.is.mobile" class="learn-form">
       <q-card-section>
         <div class="text-h6">Prueba</div>
       </q-card-section>
@@ -59,6 +59,7 @@
           v-if="!answerIsValid"
           @click="() => validateAnswer()"
           label="Entregar"
+          unelevated
           class="btn"
           color="primary"
         />
@@ -66,12 +67,27 @@
           v-else
           @click="() => validateAnswer()"
           label="Siguiente"
+          unelevated
           class="btn"
-          color="secondary"
+          color="positive"
         />
         <q-space v-if="!$q.platform.is.mobile" />
-        <q-btn @click="() => skipTask()" label="Saltar" class="btn" />
-        <q-btn @click="() => markAsKnowed()" label="¡Lo sé!" class="btn" />
+        <q-btn
+          @click="() => skipTask()"
+          label="Saltar"
+          unelevated
+          class="btn"
+          color="secondary"
+          outline
+        />
+        <q-btn
+          @click="() => markAsKnowed()"
+          label="¡Lo sé!"
+          unelevated
+          class="btn"
+          color="secondary"
+          outline
+        />
       </q-card-actions>
     </q-card>
   </q-page>

@@ -40,6 +40,7 @@
         <q-card-actions>
           <q-btn
             type="submit"
+            unelevated
             class="q-ml-sm btn"
             color="primary"
             icon="save"
@@ -48,14 +49,17 @@
           <q-btn
             @click="() => cancel()"
             outline
+            unelevated
             class="q-ml-sm btn"
             color="primary"
             icon="cancel"
             label="Cancel"
           />
+          <q-space v-if="!$q.platform.is.mobile" />
           <q-btn
             @click="() => del()"
             v-if="!isNew"
+            unelevated
             class="q-ml-sm btn"
             color="negative"
             icon="delete"

@@ -34,6 +34,7 @@
       <template v-slot:top>
         <q-btn
           @click="() => loadDemoData()"
+          unelevated
           class="q-ml-sm"
           outline
           color="primary"
@@ -42,6 +43,7 @@
         />
         <q-btn
           @click="() => add()"
+          unelevated
           class="q-ml-sm"
           color="primary"
           label="Add"
@@ -50,6 +52,7 @@
         <q-btn
           v-if="selected.length > 0"
           @click="() => del()"
+          unelevated
           class="q-ml-sm"
           icon="delete"
           color="negative"
