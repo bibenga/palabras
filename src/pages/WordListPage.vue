@@ -6,6 +6,7 @@
       :grid="$q.platform.is.mobile"
       :rows="rows"
       :columns="columns"
+      square
       row-key="id"
       selection="multiple"
       v-model:selected="selected"

@@ -1,11 +1,13 @@
 <template>
-  <q-page class="row justify-center items-center">
-    <q-card :flat="$q.platform.is.mobile">
+  <q-page
+    :class="$q.platform.is.mobile ? '' : 'row justify-center items-center'"
+  >
+    <q-card :flat="$q.platform.is.mobile" class="learn-form">
       <q-card-section>
         <div class="text-h6">Prueba</div>
       </q-card-section>
 
-      <q-card-section style="width: 400px">
+      <q-card-section>
         <!-- <q-banner
           v-if="errorMessage"
           class="text-white bg-red q-mb-md rounded-borders"
@@ -57,21 +59,39 @@
           v-if="!answerIsValid"
           @click="() => validateAnswer()"
           label="Entregar"
+          class="btn"
           color="primary"
         />
         <q-btn
           v-else
           @click="() => validateAnswer()"
           label="Siguiente"
+          class="btn"
           color="secondary"
         />
-        <q-space />
-        <q-btn @click="() => skipTask()" label="Saltar" />
-        <q-btn @click="() => markAsKnowed()" label="¡Lo sé!" />
+        <q-space v-if="!$q.platform.is.mobile" />
+        <q-btn @click="() => skipTask()" label="Saltar" class="btn" />
+        <q-btn @click="() => markAsKnowed()" label="¡Lo sé!" class="btn" />
       </q-card-actions>
     </q-card>
   </q-page>
 </template>
+
+<style>
+.mobile .learn-form {
+  width: 100%;
+}
+
+.desktop .learn-form {
+  width: 800px;
+}
+
+.mobile .btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-left: 0px !important;
+}
+</style>
 
 <script setup lang="ts">
 import {

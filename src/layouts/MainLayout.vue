@@ -69,7 +69,7 @@
         </template>
       </q-banner>
       <q-toolbar v-if="user != null && $q.platform.is.mobile">
-        <q-tabs class="bg-primary text-white">
+        <q-tabs class="bg-primary text-white" switch-indicator align="justify">
           <q-route-tab name="progress" icon="dashboard" to="/progress">
             <q-tooltip class="bg-accent">Progress</q-tooltip>
           </q-route-tab>
