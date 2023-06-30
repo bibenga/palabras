@@ -167,6 +167,7 @@ const load = async () => {
       const newTask = {
         userId: user.value?.uid,
         createdTs: new Date(),
+        updatedTs: null,
         wordId: sWord.id,
         word1: word1,
         word2: word2,
@@ -181,11 +182,11 @@ const load = async () => {
         id: dTask.id,
       };
       console.log('added', dTask);
-      $q.notify({
-        type: 'danger',
-        message: `Ha añadido una tarea ${dTask.id}`,
-        timeout: 5000,
-      });
+      // $q.notify({
+      //   type: 'danger',
+      //   message: `Ha añadido una tarea ${dTask.id}`,
+      //   timeout: 5000,
+      // });
     } else {
       dTask = null;
       $q.notify({
@@ -201,11 +202,11 @@ const load = async () => {
       ...dTask.data(),
       id: dTask.id,
     };
-    $q.notify({
-      type: 'danger',
-      message: `Hay una tarea ${sTasks.docs[0].id}`,
-      timeout: 5000,
-    });
+    // $q.notify({
+    //   type: 'danger',
+    //   message: `Hay una tarea ${sTasks.docs[0].id}`,
+    //   timeout: 5000,
+    // });
   }
   answer.value = '';
   answerIsValid.value = undefined;
@@ -218,14 +219,14 @@ const skipTask = async () => {
   console.log('skipTask', task.value.id);
   await setDoc(
     doc(firestore, 'tasks', task.value.id),
-    { isSkipedFlg: true },
+    { isSkipedFlg: true, updatedTs: new Date() },
     { merge: true }
   );
-  $q.notify({
-    type: 'warning',
-    message: `La tarea ${task.value.id} ha omitido`,
-    timeout: 5000,
-  });
+  // $q.notify({
+  //   type: 'warning',
+  //   message: `La tarea ${task.value.id} ha omitido`,
+  //   timeout: 5000,
+  // });
   await load();
 };
 
@@ -233,7 +234,7 @@ const markAsKnowed = async () => {
   console.log('markAsKnowed', task.value.id, task.value.wordId);
   await setDoc(
     doc(firestore, 'tasks', task.value.id),
-    { isSkipedFlg: true },
+    { isSkipedFlg: true, updatedTs: new Date() },
     { merge: true }
   );
   await setDoc(
@@ -246,11 +247,6 @@ const markAsKnowed = async () => {
 
 const validateAnswer = async () => {
   if (answerIsValid.value) {
-    await setDoc(
-      doc(firestore, 'tasks', task.value.id),
-      { isDoneFlg: true },
-      { merge: true }
-    );
     await load();
     answerControl.value.focus();
     return;
@@ -271,7 +267,13 @@ const validateAnswer = async () => {
   }
 
   answerIsValid.value = valid;
-  if (!valid) {
+  if (valid) {
+    await setDoc(
+      doc(firestore, 'tasks', task.value.id),
+      { isDoneFlg: true, updatedTs: new Date() },
+      { merge: true }
+    );
+  } else {
     answerControl.value.focus();
   }
 };

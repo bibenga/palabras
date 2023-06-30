@@ -121,7 +121,7 @@ const redirectOnLogin = () => {
   const to =
     route.query.redirect && typeof route.query.redirect === 'string'
       ? route.query.redirect
-      : '/';
+      : '/progress';
   console.debug(`redirect to ${to}`);
   router.push(to);
 };
@@ -144,12 +144,12 @@ const login = async () => {
       const user = userCredential.user;
       console.log('user', user);
 
-      const userName = user.displayName || user.email;
-      $q.notify({
-        type: 'positive',
-        message: `Welcome ${userName}!`,
-        timeout: 1000,
-      });
+      // const userName = user.displayName || user.email;
+      // $q.notify({
+      //   type: 'positive',
+      //   message: `Welcome ${userName}!`,
+      //   timeout: 1000,
+      // });
 
       $q.loading.hide();
       redirectOnLogin();
@@ -177,12 +177,12 @@ const loginWithGoogle = async () => {
       // ...
 
       console.debug('user', user);
-      const userName = user.displayName || user.email;
-      $q.notify({
-        type: 'positive',
-        message: `Welcome ${userName}!`,
-        timeout: 1000,
-      });
+      // const userName = user.displayName || user.email;
+      // $q.notify({
+      //   type: 'positive',
+      //   message: `Welcome ${userName}!`,
+      //   timeout: 1000,
+      // });
       redirectOnLogin();
     })
     .catch((error) => {

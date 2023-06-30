@@ -144,37 +144,42 @@ onMounted(() => {
 const save = async () => {
   console.log(`new: ${word1.value}; ${word2.value}; ${isLearnedFlg.value}`);
 
-  if (isNew) {
-    const word = {
-      userId: user.value?.uid,
-      createdTs: new Date(),
-      word1: word1.value,
-      word2: word2.value,
-      isLearnedFlg: isLearnedFlg.value,
-      random: Math.random(),
-    };
-    console.log('try add', word);
-    const aword = await addDoc(collection(firestore, 'words'), word);
-    $q.notify({
-      message: `The document ${aword.id} was added`,
-      timeout: 2000,
-    });
-  } else {
-    await setDoc(
-      doc(firestore, 'words', props.id),
-      {
+  $q.loading.show();
+  try {
+    if (isNew) {
+      const word = {
+        userId: user.value?.uid,
+        createdTs: new Date(),
         word1: word1.value,
         word2: word2.value,
         isLearnedFlg: isLearnedFlg.value,
-      },
-      { merge: true }
-    );
-    $q.notify({
-      message: `The document ${props.id} was updated`,
-      timeout: 2000,
-    });
+        random: Math.random(),
+      };
+      console.log('try add', word);
+      const aword = await addDoc(collection(firestore, 'words'), word);
+      // $q.notify({
+      //   message: `The document ${aword.id} was added`,
+      //   timeout: 2000,
+      // });
+    } else {
+      await setDoc(
+        doc(firestore, 'words', props.id),
+        {
+          word1: word1.value,
+          word2: word2.value,
+          isLearnedFlg: isLearnedFlg.value,
+        },
+        { merge: true }
+      );
+      // $q.notify({
+      //   message: `The document ${props.id} was updated`,
+      //   timeout: 2000,
+      // });
+    }
+    router.push('/word');
+  } finally {
+    $q.loading.hide();
   }
-  router.push('/word');
 };
 
 const cancel = async () => {
@@ -188,13 +193,18 @@ const del = async () => {
     cancel: true,
     focus: 'cancel',
   }).onOk(async () => {
-    console.log('del doc', props.id);
-    await deleteDoc(doc(firestore, 'words', props.id));
-    $q.notify({
-      message: `The document ${props.id} was deleted`,
-      timeout: 2000,
-    });
-    router.push('/word');
+    $q.loading.show();
+    try {
+      console.log('del doc', props.id);
+      await deleteDoc(doc(firestore, 'words', props.id));
+      $q.notify({
+        message: `The document ${props.id} was deleted`,
+        timeout: 2000,
+      });
+      router.push('/word');
+    } finally {
+      $q.loading.hide();
+    }
   });
 };
 </script>

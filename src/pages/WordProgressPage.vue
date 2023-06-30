@@ -1,8 +1,9 @@
 <template>
   <q-page>
     <div class="q-px-lg q-py-md">
-      <q-timeline v-if="!pending" color="secondary">
-        <template v-if="tasksByDate.today">
+      <div v-if="!pending && tasks.length == 0">You do not worked!</div>
+      <q-timeline v-if="!pending && tasks.length > 0" color="secondary">
+        <template v-if="tasksByDate.today.length > 0">
           <q-timeline-entry heading tag="h6"> Today </q-timeline-entry>
 
           <q-timeline-entry
@@ -14,7 +15,7 @@
           />
         </template>
 
-        <template v-if="tasksByDate.yeasterday">
+        <template v-if="tasksByDate.yeasterday > 0">
           <q-timeline-entry heading tag="h6"> Yeasterday </q-timeline-entry>
 
           <q-timeline-entry
@@ -26,7 +27,7 @@
           />
         </template>
 
-        <template v-if="tasksByDate.previously">
+        <template v-if="tasksByDate.previously > 0">
           <q-timeline-entry heading tag="h6"> Previously </q-timeline-entry>
 
           <q-timeline-entry

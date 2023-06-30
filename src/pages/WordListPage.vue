@@ -301,7 +301,7 @@ const del = async () => {
   const docs = selected.value;
   $q.dialog({
     title: 'Confirmation',
-    message: `Do yo want delete selected ${docs.length} word/words?`,
+    message: `Do yo want to delete selected ${docs.length} word/words?`,
     cancel: true,
     focus: 'cancel',
   }).onOk(async () => {
@@ -311,19 +311,11 @@ const del = async () => {
       for (const d of docs) {
         console.log('del doc', d);
         await deleteDoc(doc(firestore, 'words', d.id));
-        if (docsLength < 5) {
-          $q.notify({
-            message: `The document ${d.id} was deleted`,
-            timeout: 2000,
-          });
-        }
       }
-      if (docsLength >= 5) {
-        $q.notify({
-          message: `Deleted ${docsLength} documents`,
-          timeout: 2000,
-        });
-      }
+      $q.notify({
+        message: `Deleted ${docsLength} documents`,
+        timeout: 2000,
+      });
 
       selected.value = [];
       pagination.value.rowsNumber = 0;

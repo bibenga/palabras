@@ -81,11 +81,12 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue';
 import { useQuasar, QInput, QSpinnerGears } from 'quasar';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 
 const errorMessage = ref('');
 const usernameRef = ref<QInput>();
@@ -99,6 +100,15 @@ const password = ref<string>('9B725739-9470-4237-8A75-0B2391BAA4C6');
 
 const fireauth = inject<Auth>('fireauth');
 
+const redirectOnLogin = () => {
+  const to =
+    route.query.redirect && typeof route.query.redirect === 'string'
+      ? route.query.redirect
+      : '/progress';
+  console.debug(`redirect to ${to}`);
+  router.push(to);
+};
+
 const register = () => {
   $q.loading.show({
     spinner: QSpinnerGears,
@@ -107,17 +117,17 @@ const register = () => {
 
   createUserWithEmailAndPassword(fireauth, username.value, password.value)
     .then((userCredential) => {
-      const user = userCredential.user;
+      // const user = userCredential.user;
 
-      const userName = user.displayName || user.email;
-      $q.notify({
-        type: 'positive',
-        message: `Welcome ${userName}!`,
-        timeout: 1000,
-      });
+      // const userName = user.displayName || user.email;
+      // $q.notify({
+      //   type: 'positive',
+      //   message: `Welcome ${userName}!`,
+      //   timeout: 1000,
+      // });
 
+      redirectOnLogin();
       $q.loading.hide();
-      router.push('/');
     })
     .catch((error) => {
       console.log('error', error);
