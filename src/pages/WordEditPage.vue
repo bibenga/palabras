@@ -4,7 +4,9 @@
       <q-card flat>
         <q-card-section>
           <div v-if="isNew" class="text-h6">Add new word</div>
-          <div v-else class="text-h6">Edit {{ id }} word</div>
+          <div v-else class="text-h6">
+            Edit {{ docRef.word1.join(', ') }} word
+          </div>
         </q-card-section>
 
         <q-card-section>
@@ -204,7 +206,7 @@ const del = async () => {
       console.log('del doc', props.id);
       await deleteDoc(doc(firestore, 'words', props.id));
       $q.notify({
-        message: `The document ${props.id} was deleted`,
+        message: 'The document was deleted',
         timeout: 2000,
       });
       router.push('/word');
