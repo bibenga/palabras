@@ -16,6 +16,8 @@
       binary-state-sort
       @request="onRequest"
       @row-click="(evt, row, index) => rowClicked(row)"
+      card-class="no-shadow"
+      card-style="border: 1px"
     >
       <!-- <template v-slot:top-right>
         <q-input
@@ -33,10 +35,11 @@
 
       <template v-slot:top>
         <q-btn
+          v-if="pagination.rowsNumber == 0"
           @click="() => loadDemoData()"
           unelevated
-          class="q-ml-sm"
           outline
+          class="q-ml-sm btn"
           color="primary"
           label="Add demo data"
           icon="add"
@@ -44,7 +47,7 @@
         <q-btn
           @click="() => add()"
           unelevated
-          class="q-ml-sm"
+          class="q-ml-sm btn"
           color="primary"
           label="Add"
           icon="add"
@@ -85,6 +88,14 @@
     </q-table>
   </q-page>
 </template>
+
+<style>
+.mobile .btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-left: 0px !important;
+}
+</style>
 
 <script setup lang="ts">
 import { query } from 'firebase/database';
