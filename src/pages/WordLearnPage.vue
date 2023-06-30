@@ -252,6 +252,7 @@ const validateAnswer = async () => {
       { merge: true }
     );
     await load();
+    answerControl.value.focus();
     return;
   }
 

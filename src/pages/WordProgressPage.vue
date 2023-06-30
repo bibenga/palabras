@@ -78,7 +78,7 @@ import {
 } from 'firebase/firestore';
 import { computed, inject } from 'vue';
 import { useCollection, useCurrentUser } from 'vuefire';
-import { formatTimeAgo } from '@vueuse/core';
+import { formatTimeAgo, formatDate } from '@vueuse/core';
 
 const firestore = inject<Firestore>('firestore');
 const user = useCurrentUser();
@@ -123,11 +123,13 @@ const tasks2 = computed(() => {
 });
 
 const formatTime = (d: Date): string => {
-  return `${d.getHours()}:${d.getMinutes()}`;
+  // return `${d.getHours()}:${d.getMinutes()}`;
+  return formatDate(d, 'H:mm');
 };
 
 const formatDatetime = (d: Date): string => {
-  return d.toLocaleString();
+  // return d.toLocaleString();
+  return formatDate(d, 'D MMMM H:mm');
 };
 
 // const load = async () => {
