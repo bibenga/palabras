@@ -5,7 +5,6 @@
       <q-timeline v-if="!pending && tasks.length > 0" color="secondary">
         <template v-if="tasksByDate.today.length > 0">
           <q-timeline-entry heading tag="h6"> Today </q-timeline-entry>
-
           <q-timeline-entry
             v-for="task of tasksByDate.today"
             v-bind:key="task.id"
@@ -15,9 +14,8 @@
           />
         </template>
 
-        <template v-if="tasksByDate.yeasterday > 0">
+        <template v-if="tasksByDate.yeasterday.length > 0">
           <q-timeline-entry heading tag="h6"> Yeasterday </q-timeline-entry>
-
           <q-timeline-entry
             v-for="task of tasksByDate.yeasterday"
             v-bind:key="task.id"
@@ -27,10 +25,9 @@
           />
         </template>
 
-        <template v-if="tasksByDate.previously > 0">
+        <template v-if="tasksByDate.previously.length > 0">
           <q-timeline-entry heading tag="h6"> Previously </q-timeline-entry>
-
-          <q-timeline-entry
+          <q-timelie-entry
             v-for="task of tasksByDate.previously"
             v-bind:key="task.id"
             :title="task.word1.join(', ')"
