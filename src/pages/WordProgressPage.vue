@@ -27,7 +27,7 @@
 
         <template v-if="tasksByDate.previously.length > 0">
           <q-timeline-entry heading tag="h6"> Previously </q-timeline-entry>
-          <q-timelie-entry
+          <q-timeline-entry
             v-for="task of tasksByDate.previously"
             v-bind:key="task.id"
             :title="task.word1.join(', ')"
