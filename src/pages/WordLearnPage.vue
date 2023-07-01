@@ -40,7 +40,7 @@
 
         <div>
           <q-input
-            ref="answerControl"
+            ref="answerInput"
             v-model.trim="answer"
             style="font-size: 1.5em"
             @keydown.enter.prevent="validateAnswer"
@@ -66,7 +66,7 @@
         />
         <q-btn
           v-else
-          @click="() => validateAnswer()"
+          @click="() => generateNext()"
           label="Siguiente"
           unelevated
           class="btn"
@@ -114,6 +114,7 @@
 import {
   DocumentData,
   Firestore,
+  QuerySnapshot,
   addDoc,
   and,
   collection,
@@ -142,7 +143,6 @@ const task = ref();
 const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
-const selectedDebug = ref();
 
 // const { data: lastTask, pending: loading } = useCollection(
 //   query(
@@ -170,7 +170,7 @@ const selectedDebug = ref();
 // });
 
 const load = async () => {
-  const qTasks = query(
+  const tasksQuery = query(
     tasksCol,
     and(
       where('userId', '==', user.value?.uid),
@@ -180,26 +180,25 @@ const load = async () => {
     orderBy('createdTs', 'desc'),
     limit(1)
   );
-  const sTasks = await getDocs(qTasks);
-  let dTask: DocumentData | null;
-  if (sTasks.size == 0) {
+  const tasksSnap = await getDocs(tasksQuery);
+  // let dTask: DocumentData | null;
+  if (tasksSnap.size == 0) {
     // [0.3, 0.5, 0.8]
     // 0.9 => '>=' null => '<=' 1
     // 0.4 => 1 => 1
     const rank = Math.random();
-    let qWords = query(
-      wordsCol,
-      and(
-        where('userId', '==', user.value?.uid),
-        where('isLearnedFlg', '==', false),
-        where('random', '>=', rank)
+    const queries = [
+      query(
+        wordsCol,
+        and(
+          where('userId', '==', user.value?.uid),
+          where('isLearnedFlg', '==', false),
+          where('random', '>=', rank)
+        ),
+        orderBy('random', 'asc'),
+        limit(1)
       ),
-      orderBy('random', 'asc'),
-      limit(1)
-    );
-    let sWords = await getDocs(qWords);
-    if (sWords.size == 0) {
-      qWords = query(
+      query(
         wordsCol,
         and(
           where('userId', '==', user.value?.uid),
@@ -208,12 +207,19 @@ const load = async () => {
         ),
         orderBy('random', 'asc'),
         limit(1)
-      );
-      sWords = await getDocs(qWords);
+      ),
+    ];
+
+    let randomWords: QuerySnapshot<DocumentData> | null = null;
+    for (const wordsQuery of queries) {
+      randomWords = await getDocs(wordsQuery);
+      if (randomWords.size == 1) {
+        break;
+      }
     }
 
-    if (sWords.size == 1) {
-      const sWord = sWords.docs[0];
+    if (randomWords != null && randomWords.size == 1) {
+      const sWord = randomWords.docs[0];
       console.log(sWord);
       let word1, word2;
       if (Math.random() >= 0.5) {
@@ -233,16 +239,13 @@ const load = async () => {
         isDoneFlg: false,
         isSkipedFlg: false,
       };
-      selectedDebug.value = sWords.docs[0].data().random;
-      console.log('add', newTask);
-      dTask = await addDoc(tasksCol, newTask);
+      // console.log('add', newTask);
+      const taskDoc = await addDoc(tasksCol, newTask);
       task.value = {
         ...newTask,
-        id: dTask.id,
+        id: taskDoc.id,
       };
-      console.log('added', dTask);
     } else {
-      dTask = null;
       $q.notify({
         type: 'danger',
         message: 'No hay palabras!',
@@ -250,57 +253,75 @@ const load = async () => {
       });
     }
   } else {
-    console.log(sTasks.docs[0]);
-    dTask = sTasks.docs[0];
+    const taskDoc = tasksSnap.docs[0];
     task.value = {
-      ...dTask.data(),
-      id: dTask.id,
+      ...taskDoc.data(),
+      id: taskDoc.id,
     };
   }
   answer.value = '';
   answerIsValid.value = undefined;
 };
+
 onMounted(() => {
-  load();
+  $q.loading.show();
+  try {
+    load();
+  } finally {
+    $q.loading.hide();
+  }
 });
 
 const skipTask = async () => {
+  $q.loading.show();
   try {
-    await updateDoc(doc(tasksCol, task.value.id), {
-      isSkipedFlg: true,
-      updatedTs: new Date(),
-    });
-  } catch (error) {
-    console.error(error);
+    try {
+      await updateDoc(doc(tasksCol, task.value.id), {
+        isSkipedFlg: true,
+        updatedTs: new Date(),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    await load();
+  } finally {
+    $q.loading.hide();
   }
-  await load();
 };
 
 const markAsKnowed = async () => {
-  console.log('markAsKnowed', task.value.id, task.value.wordId);
-  try {
-    await updateDoc(doc(tasksCol, task.value.id), {
-      isSkipedFlg: true,
-      updatedTs: new Date(),
-    });
-  } catch (error) {
-    console.error(error);
-  }
-  try {
-    await updateDoc(doc(wordsCol, task.value.wordId), { isLearnedFlg: true });
-  } catch (error) {
-    console.error(error);
-  }
-  await load();
+  $q.dialog({
+    title: 'Confirmation',
+    message: 'Are you sure that you know this word?',
+    cancel: true,
+    focus: 'cancel',
+  }).onOk(async () => {
+    $q.loading.show();
+    try {
+      console.log('markAsKnowed', task.value.id, task.value.wordId);
+      try {
+        await updateDoc(doc(tasksCol, task.value.id), {
+          isSkipedFlg: true,
+          updatedTs: new Date(),
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      try {
+        await updateDoc(doc(wordsCol, task.value.wordId), {
+          isLearnedFlg: true,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      await load();
+    } finally {
+      $q.loading.hide();
+    }
+  });
 };
 
 const validateAnswer = async () => {
-  if (answerIsValid.value) {
-    await load();
-    answerInput.value.focus();
-    return;
-  }
-
   const splitRule = /[ \r\n¡!¿?.,:;'\"]+/;
   // const convert = (s: string) => s.toLowerCase().normalize('NFKD').split(splitRule);
   const convert = (s: string) => deburr(s.toLowerCase()).split(splitRule);
@@ -323,6 +344,16 @@ const validateAnswer = async () => {
     });
   } else {
     answerInput.value.focus();
+  }
+};
+
+const generateNext = async () => {
+  $q.loading.show();
+  try {
+    await load();
+    answerInput.value.focus();
+  } finally {
+    $q.loading.hide();
   }
 };
 </script>
