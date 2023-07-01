@@ -81,7 +81,6 @@
 
 <script setup lang="ts">
 import {
-  DocumentData,
   addDoc,
   collection,
   deleteDoc,
@@ -92,12 +91,14 @@ import {
 import { useQuasar } from 'quasar';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCurrentUser, useDocument, useFirestore } from 'vuefire';
+import { useCurrentUser, useFirestore } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
+
 const user = useCurrentUser();
 const firestore = useFirestore();
+const wordsCol = collection(firestore, 'words');
 
 const props = defineProps<{
   id: string;
@@ -114,7 +115,7 @@ const isLearnedFlg = ref(false);
 //   pending.value = false;
 // } else {
 //   const { data: word, promise } = useDocument(
-//     doc(firestore, 'words', props.id)
+//     doc(wordsCol, props.id)
 //   );
 //   onMounted(async () => {
 //     $q.loading.show();
@@ -138,7 +139,7 @@ const load = async () => {
   if (!isNew) {
     $q.loading.show();
     try {
-      const docSnap = await getDoc(doc(firestore, 'words', props.id));
+      const docSnap = await getDoc(doc(wordsCol, props.id));
       docSnap.ref;
       console.log(docSnap.data());
       const docData = docSnap.data();
@@ -173,7 +174,7 @@ const save = async () => {
   try {
     if (isNew) {
       try {
-        await addDoc(collection(firestore, 'words'), {
+        await addDoc(wordsCol, {
           userId: user.value?.uid,
           createdTs: new Date(),
           word1: word1.value,
@@ -186,7 +187,7 @@ const save = async () => {
       }
     } else {
       try {
-        await updateDoc(doc(firestore, 'words', props.id), {
+        await updateDoc(doc(wordsCol, props.id), {
           word1: word1.value,
           word2: word2.value,
           isLearnedFlg: isLearnedFlg.value,
@@ -215,7 +216,7 @@ const del = async () => {
     $q.loading.show();
     try {
       console.log('del doc', props.id);
-      await deleteDoc(doc(firestore, 'words', props.id));
+      await deleteDoc(doc(wordsCol, props.id));
       $q.notify({
         message: 'The document was deleted',
         timeout: 2000,

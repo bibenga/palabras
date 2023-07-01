@@ -55,16 +55,16 @@ import { useCollection, useCurrentUser, useFirestore } from 'vuefire';
 import { formatTimeAgo, formatDate } from '@vueuse/core';
 
 const user = useCurrentUser();
-
 const firestore = useFirestore();
-const cTasks = collection(firestore, 'tasks');
-const qTasks = query(
-  cTasks,
+const tasksCol = collection(firestore, 'tasks');
+const tasksQuery = query(
+  tasksCol,
   and(where('userId', '==', user.value?.uid)),
   orderBy('createdTs', 'desc'),
   limit(20)
 );
-const { data: tasks, pending } = useCollection(qTasks, {
+
+const { data: tasks, pending } = useCollection(tasksQuery, {
   ssrKey: 'tasksProgress',
 });
 const tasksByDate = computed(() => {

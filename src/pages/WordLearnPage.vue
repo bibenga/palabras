@@ -18,6 +18,7 @@
         <!-- <div>rank: {{ rankDebug }}</div>
         <div>selected: {{ selectedDebug }}</div>
         <div>{{ task }}</div> -->
+        <!-- <p>{{ task2.id }} -> {{ task2 }}</p> -->
 
         <p v-if="task != null" style="min-height: 3em">
           <span>
@@ -121,7 +122,7 @@ import {
   limit,
   orderBy,
   query,
-  setDoc,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
@@ -131,20 +132,46 @@ import deburr from 'lodash/deburr';
 import isEqual from 'lodash/isEqual';
 
 const $q = useQuasar();
-const firestore = inject<Firestore>('firestore');
 
 const user = useCurrentUser();
+const firestore = inject<Firestore>('firestore');
+const tasksCol = collection(firestore, 'tasks');
+const wordsCol = collection(firestore, 'words');
 
 const task = ref();
-const answerControl = ref();
+const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
 const selectedDebug = ref();
 
+// const { data: lastTask, pending: loading } = useCollection(
+//   query(
+//     tasksCol,
+//     and(
+//       where('userId', '==', user.value?.uid),
+//       where('isDoneFlg', '==', false),
+//       where('isSkipedFlg', '==', false)
+//     ),
+//     orderBy('createdTs', 'desc'),
+//     limit(1)
+//   ),
+//   {
+//     ssrKey: 'currentTask',
+//   }
+// );
+// const task2 = computed(() => {
+//   if (!loading.value && lastTask.value.length == 1) {
+//     const res = lastTask.value[0];
+//     console.log('task2', res, res?.id, res);
+//     return res;
+//   }
+//   console.log('task2');
+//   return null;
+// });
+
 const load = async () => {
-  const cTasks = collection(firestore, 'tasks');
   const qTasks = query(
-    cTasks,
+    tasksCol,
     and(
       where('userId', '==', user.value?.uid),
       where('isDoneFlg', '==', false),
@@ -156,14 +183,12 @@ const load = async () => {
   const sTasks = await getDocs(qTasks);
   let dTask: DocumentData | null;
   if (sTasks.size == 0) {
-    const cWords = collection(firestore, 'words');
-
     // [0.3, 0.5, 0.8]
     // 0.9 => '>=' null => '<=' 1
     // 0.4 => 1 => 1
     const rank = Math.random();
     let qWords = query(
-      cWords,
+      wordsCol,
       and(
         where('userId', '==', user.value?.uid),
         where('isLearnedFlg', '==', false),
@@ -175,7 +200,7 @@ const load = async () => {
     let sWords = await getDocs(qWords);
     if (sWords.size == 0) {
       qWords = query(
-        cWords,
+        wordsCol,
         and(
           where('userId', '==', user.value?.uid),
           where('isLearnedFlg', '==', false),
@@ -210,7 +235,7 @@ const load = async () => {
       };
       selectedDebug.value = sWords.docs[0].data().random;
       console.log('add', newTask);
-      dTask = await addDoc(cTasks, newTask);
+      dTask = await addDoc(tasksCol, newTask);
       task.value = {
         ...newTask,
         id: dTask.id,
@@ -240,41 +265,29 @@ onMounted(() => {
 });
 
 const skipTask = async () => {
-  console.log('skipTask', task.value.id);
   try {
-    await setDoc(
-      doc(firestore, 'tasks', task.value.id),
-      { isSkipedFlg: true, updatedTs: new Date() },
-      { merge: true }
-    );
+    await updateDoc(doc(tasksCol, task.value.id), {
+      isSkipedFlg: true,
+      updatedTs: new Date(),
+    });
   } catch (error) {
     console.error(error);
   }
-  // $q.notify({
-  //   type: 'warning',
-  //   message: `La tarea ${task.value.id} ha omitido`,
-  //   timeout: 5000,
-  // });
   await load();
 };
 
 const markAsKnowed = async () => {
   console.log('markAsKnowed', task.value.id, task.value.wordId);
   try {
-    await setDoc(
-      doc(firestore, 'tasks', task.value.id),
-      { isSkipedFlg: true, updatedTs: new Date() },
-      { merge: true }
-    );
+    await updateDoc(doc(tasksCol, task.value.id), {
+      isSkipedFlg: true,
+      updatedTs: new Date(),
+    });
   } catch (error) {
     console.error(error);
   }
   try {
-    await setDoc(
-      doc(firestore, 'words', task.value.wordId),
-      { isLearnedFlg: true },
-      { merge: true }
-    );
+    await updateDoc(doc(wordsCol, task.value.wordId), { isLearnedFlg: true });
   } catch (error) {
     console.error(error);
   }
@@ -284,7 +297,7 @@ const markAsKnowed = async () => {
 const validateAnswer = async () => {
   if (answerIsValid.value) {
     await load();
-    answerControl.value.focus();
+    answerInput.value.focus();
     return;
   }
 
@@ -304,13 +317,12 @@ const validateAnswer = async () => {
 
   answerIsValid.value = valid;
   if (valid) {
-    await setDoc(
-      doc(firestore, 'tasks', task.value.id),
-      { isDoneFlg: true, updatedTs: new Date() },
-      { merge: true }
-    );
+    await updateDoc(doc(tasksCol, task.value.id), {
+      isDoneFlg: true,
+      updatedTs: new Date(),
+    });
   } else {
-    answerControl.value.focus();
+    answerInput.value.focus();
   }
 };
 </script>

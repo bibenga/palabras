@@ -118,13 +118,14 @@ const router = useRouter();
 
 const user = useCurrentUser();
 const firestore = useFirestore();
+const wordsCol = collection(firestore, 'words');
 
 const pagination = ref({
   rowsPerPage: 0,
 });
 const wordsDynamicQuery = computed(() => {
   return query(
-    collection(firestore, 'words'),
+    wordsCol,
     where('userId', '==', user.value?.uid),
     orderBy('word1', 'asc')
   );
@@ -191,7 +192,7 @@ const loadDemoData = async () => {
         isLearnedFlg: false,
         random: Math.random(),
       };
-      const aword = await addDoc(collection(firestore, 'words'), word);
+      const aword = await addDoc(wordsCol, word);
       console.log('added', word, aword);
     }
     $q.notify({
@@ -230,7 +231,7 @@ const del = async () => {
       const docsLength = docs.length;
       for (const d of docs) {
         console.log('del doc', d);
-        await deleteDoc(doc(firestore, 'words', d.id));
+        await deleteDoc(doc(wordsCol, d.id));
       }
       selected.value = [];
       $q.notify({
