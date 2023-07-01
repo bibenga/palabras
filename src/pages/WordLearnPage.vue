@@ -35,7 +35,7 @@
             filled
             autogrow
             autofocus
-            :readonly="answerIsValid"
+            :readonly="task == null || answerIsValid"
             :error="answerIsValid !== undefined && !answerIsValid"
           />
         </div>
@@ -45,7 +45,7 @@
 
       <q-card-actions>
         <q-btn
-          v-if="!answerIsValid"
+          v-if="task != null && !answerIsValid"
           @click="() => validateAnswer()"
           label="Entregar"
           unelevated
@@ -54,7 +54,7 @@
         />
         <q-btn
           v-else
-          @click="() => generateNext()"
+          @click="() => nextTask()"
           label="Siguiente"
           unelevated
           class="btn"
@@ -62,7 +62,7 @@
         />
         <q-space v-if="!$q.platform.is.mobile" />
         <q-btn
-          v-if="!answerIsValid"
+          v-if="task != null && !answerIsValid"
           @click="() => skipTask()"
           label="Saltar"
           unelevated
@@ -71,7 +71,7 @@
           outline
         />
         <q-btn
-          v-if="!answerIsValid"
+          v-if="task != null && !answerIsValid"
           @click="() => markAsKnowed()"
           label="¡Lo sé!"
           unelevated
@@ -109,13 +109,14 @@ import {
   doc,
   getDocs,
   limit,
+  onSnapshot,
   orderBy,
   query,
   updateDoc,
   where,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, onMounted, ref } from 'vue';
+import { inject, onUnmounted, ref } from 'vue';
 import { useCurrentUser } from 'vuefire';
 import deburr from 'lodash/deburr';
 import isEqual from 'lodash/isEqual';
@@ -132,48 +133,29 @@ const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
 
-const load = async () => {
-  const taskDb = await getTask();
-  if (taskDb == null) {
-    task.value = await newTask();
+const tasksQuery = query(
+  tasksCol,
+  and(
+    where('userId', '==', user.value?.uid),
+    where('isDoneFlg', '==', false),
+    where('isSkipedFlg', '==', false)
+  ),
+  orderBy('createdTs', 'desc'),
+  limit(1)
+);
+const unsubscribe = onSnapshot(tasksQuery, (snapshot) => {
+  if (!snapshot.empty) {
+    const taskDoc = snapshot.docs[0];
+    task.value = {
+      id: taskDoc.id,
+      word1: taskDoc.data().word1,
+      word2: taskDoc.data().word2,
+    };
   } else {
-    task.value = taskDb;
-  }
-  answer.value = '';
-  answerIsValid.value = undefined;
-};
-
-onMounted(async () => {
-  $q.loading.show();
-  try {
-    await load();
-  } finally {
-    $q.loading.hide();
+    task.value = null;
   }
 });
-
-const getTask = async () => {
-  const tasksQuery = query(
-    tasksCol,
-    and(
-      where('userId', '==', user.value?.uid),
-      where('isDoneFlg', '==', false),
-      where('isSkipedFlg', '==', false)
-    ),
-    orderBy('createdTs', 'desc'),
-    limit(1)
-  );
-  const tasksSnap = await getDocs(tasksQuery);
-  if (tasksSnap.empty) {
-    return null;
-  }
-  const taskDoc = tasksSnap.docs[0];
-  return {
-    id: taskDoc.id,
-    word1: taskDoc.data().word1,
-    word2: taskDoc.data().word2,
-  };
-};
+onUnmounted(() => unsubscribe());
 
 const newTask = async () => {
   const word = await getNextRandomWord();
@@ -186,7 +168,7 @@ const newTask = async () => {
       word1 = word.word2;
       word2 = word.word1;
     }
-    const newTask = {
+    await addDoc(tasksCol, {
       userId: user.value?.uid,
       createdTs: new Date(),
       updatedTs: null,
@@ -195,13 +177,7 @@ const newTask = async () => {
       word2: word2,
       isDoneFlg: false,
       isSkipedFlg: false,
-    };
-    const taskDoc = await addDoc(tasksCol, newTask);
-    return {
-      id: taskDoc.id,
-      word1: word1,
-      word2: word2,
-    };
+    });
   } else {
     $q.notify({
       type: 'danger',
@@ -209,7 +185,9 @@ const newTask = async () => {
       timeout: 5000,
     });
   }
-  return null;
+  answer.value = '';
+  answerIsValid.value = undefined;
+  answerInput.value.focus();
 };
 
 const getNextRandomWord = async () => {
@@ -264,7 +242,7 @@ const skipTask = async () => {
     } catch (error) {
       console.error(error);
     }
-    await load();
+    await newTask();
   } finally {
     $q.loading.hide();
   }
@@ -295,7 +273,7 @@ const markAsKnowed = async () => {
       } catch (error) {
         console.error(error);
       }
-      await load();
+      await newTask();
     } finally {
       $q.loading.hide();
     }
@@ -328,11 +306,10 @@ const validateAnswer = async () => {
   }
 };
 
-const generateNext = async () => {
+const nextTask = async () => {
   $q.loading.show();
   try {
-    await load();
-    answerInput.value.focus();
+    await newTask();
   } finally {
     $q.loading.hide();
   }
