@@ -134,46 +134,27 @@ const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
 
-// const getNextRandomWord = async () => {
-//   const rank = Math.random();
-//   const queries = [
-//     query(
-//       wordsCol,
-//       and(
-//         where('userId', '==', user.value?.uid),
-//         where('isLearnedFlg', '==', false),
-//         where('random', '>=', rank)
-//       ),
-//       orderBy('random', 'asc'),
-//       limit(1)
-//     ),
-//     query(
-//       wordsCol,
-//       and(
-//         where('userId', '==', user.value?.uid),
-//         where('isLearnedFlg', '==', false),
-//         where('random', '<=', rank)
-//       ),
-//       orderBy('random', 'asc'),
-//       limit(1)
-//     ),
-//   ];
-
-//   for (const wordsQuery of queries) {
-//     const randomWords = await getDocs(wordsQuery);
-//     if (!randomWords.empty) {
-//       const wordDoc = randomWords.docs[0];
-//       return {
-//         id: wordDoc.id,
-//         word1: wordDoc.data().word1,
-//         word2: wordDoc.data().word2,
-//       };
-//     }
-//   }
-//   return null;
-// };
-
 const load = async () => {
+  const taskDb = await getTask();
+  if (taskDb == null) {
+    task.value = await newTask();
+  } else {
+    task.value = taskDb;
+  }
+  answer.value = '';
+  answerIsValid.value = undefined;
+};
+
+onMounted(async () => {
+  $q.loading.show();
+  try {
+    await load();
+  } finally {
+    $q.loading.hide();
+  }
+});
+
+const getTask = async () => {
   const tasksQuery = query(
     tasksCol,
     and(
@@ -185,95 +166,94 @@ const load = async () => {
     limit(1)
   );
   const tasksSnap = await getDocs(tasksQuery);
-  if (tasksSnap.size == 0) {
-    // [0.3, 0.5, 0.8]
-    // 0.9 => '>=' null => '<=' 1
-    // 0.4 => 1 => 1
-    const rank = Math.random();
-    const queries = [
-      query(
-        wordsCol,
-        and(
-          where('userId', '==', user.value?.uid),
-          where('isLearnedFlg', '==', false),
-          where('random', '>=', rank)
-        ),
-        orderBy('random', 'asc'),
-        limit(1)
-      ),
-      query(
-        wordsCol,
-        and(
-          where('userId', '==', user.value?.uid),
-          where('isLearnedFlg', '==', false),
-          where('random', '<=', rank)
-        ),
-        orderBy('random', 'asc'),
-        limit(1)
-      ),
-    ];
-
-    let randomWords: QuerySnapshot<DocumentData> | null = null;
-    for (const wordsQuery of queries) {
-      randomWords = await getDocs(wordsQuery);
-      if (!randomWords.empty) {
-        break;
-      }
-    }
-
-    if (randomWords != null && !randomWords.empty) {
-      const sWord = randomWords.docs[0];
-      console.log(sWord);
-      let word1, word2;
-      if (Math.random() >= 0.5) {
-        word1 = sWord.data().word1;
-        word2 = sWord.data().word2;
-      } else {
-        word1 = sWord.data().word2;
-        word2 = sWord.data().word1;
-      }
-      const newTask = {
-        userId: user.value?.uid,
-        createdTs: new Date(),
-        updatedTs: null,
-        wordId: sWord.id,
-        word1: word1,
-        word2: word2,
-        isDoneFlg: false,
-        isSkipedFlg: false,
-      };
-      const taskDoc = await addDoc(tasksCol, newTask);
-      task.value = {
-        id: taskDoc.id,
-        ...newTask,
-      };
-    } else {
-      $q.notify({
-        type: 'danger',
-        message: 'No hay palabras!',
-        timeout: 5000,
-      });
-    }
-  } else {
-    const taskDoc = tasksSnap.docs[0];
-    task.value = {
-      id: taskDoc.id,
-      word1: taskDoc.data().word1,
-      word2: taskDoc.data().word2,
-    };
+  if (tasksSnap.empty) {
+    return null;
   }
-  answer.value = '';
-  answerIsValid.value = undefined;
+  const taskDoc = tasksSnap.docs[0];
+  return {
+    id: taskDoc.id,
+    word1: taskDoc.data().word1,
+    word2: taskDoc.data().word2,
+  };
 };
 
-onMounted(() => {
-  $q.loading.show();
-  try {
-    load();
-  } finally {
-    $q.loading.hide();
+const newTask = async () => {
+  const word = await getNextRandomWord();
+  if (word != null) {
+    let word1, word2;
+    if (Math.random() >= 0.5) {
+      word1 = word.word1;
+      word2 = word.word2;
+    } else {
+      word1 = word.word2;
+      word2 = word.word1;
+    }
+    const newTask = {
+      userId: user.value?.uid,
+      createdTs: new Date(),
+      updatedTs: null,
+      wordId: word.id,
+      word1: word1,
+      word2: word2,
+      isDoneFlg: false,
+      isSkipedFlg: false,
+    };
+    const taskDoc = await addDoc(tasksCol, newTask);
+    return {
+      id: taskDoc.id,
+      word1: word1,
+      word2: word2,
+    };
+  } else {
+    $q.notify({
+      type: 'danger',
+      message: 'No hay palabras!',
+      timeout: 5000,
+    });
   }
-});
+  return null;
+};
+
+const getNextRandomWord = async () => {
+  // [0.3, 0.5, 0.8]
+  // 0.9 => '>=' null => '<=' 1
+  // 0.4 => 1 => 1
+  const rank = Math.random();
+  const queries = [
+    query(
+      wordsCol,
+      and(
+        where('userId', '==', user.value?.uid),
+        where('isLearnedFlg', '==', false),
+        where('random', '>=', rank)
+      ),
+      orderBy('random', 'asc'),
+      limit(1)
+    ),
+    query(
+      wordsCol,
+      and(
+        where('userId', '==', user.value?.uid),
+        where('isLearnedFlg', '==', false),
+        where('random', '<=', rank)
+      ),
+      orderBy('random', 'asc'),
+      limit(1)
+    ),
+  ];
+  for (const wordsQuery of queries) {
+    const randomWords = await getDocs(wordsQuery);
+    if (!randomWords.empty) {
+      const wordDoc = randomWords.docs[0];
+      return {
+        id: wordDoc.id,
+        word1: wordDoc.data().word1,
+        word2: wordDoc.data().word2,
+      };
+    }
+  }
+  return null;
+};
 
 const skipTask = async () => {
   $q.loading.show();
