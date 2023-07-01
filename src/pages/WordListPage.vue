@@ -186,22 +186,8 @@ const loadDemoData = async () => {
 
   $q.loading.show();
   try {
-    const demoPairs = [
-      [['decir'], ['сказать', 'говорить']],
-      [
-        ['empezar', 'comenzar'],
-        ['начать', 'начинать'],
-      ],
-      [['dar'], ['давать']],
-      [['volver'], ['возвращаться']],
-      [['abrir'], ['открывать']],
-      [['cerrar'], ['закрыть']],
-      [['contar'], ['считать']],
-      [['encontrar'], ['находить']],
-      [['contestar'], ['отвечать']],
-      [['Nadie'], ['Ни кто']],
-      [['Nada'], ['Ни что', 'Ничего']],
-    ];
+    const demoPairs = (await import('./wordPairs.json')).default;
+    console.log('demoPairs', demoPairs);
     for (const pair of demoPairs) {
       const word = {
         userId: user.value?.uid,
@@ -212,7 +198,7 @@ const loadDemoData = async () => {
         random: Math.random(),
       };
       const aword = await addDoc(wordsCol, word);
-      console.log('added', word, aword);
+      // console.log('added', word, aword);
     }
     $q.notify({
       message: `Was added ${demoPairs.length} word pair`,
