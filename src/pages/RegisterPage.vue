@@ -1,9 +1,7 @@
 <template>
-  <q-page
-    :class="$q.platform.is.mobile ? '' : 'row justify-center items-center'"
-  >
+  <q-page :class="$q.screen.xs ? '' : 'row justify-center items-center'">
     <q-form @submit.prevent="register" class="login-form">
-      <q-card :flat="$q.platform.is.mobile">
+      <q-card :flat="$q.screen.xs">
         <q-card-section>
           <div class="text-h6">Registrarse</div>
           <div class="text-subtitle2">by bibenga</div>
@@ -65,15 +63,15 @@
 </template>
 
 <style>
-.mobile .login-form {
+.screen--xs .login-form {
   width: 100%;
 }
 
-.desktop .login-form {
+.login-form {
   width: 400px;
 }
 
-.mobile .login-btn {
+.screen--xs .login-btn {
   width: 100%;
 }
 </style>

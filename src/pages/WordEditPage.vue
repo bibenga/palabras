@@ -55,7 +55,7 @@
             icon="cancel"
             label="Cancel"
           />
-          <q-space v-if="!$q.platform.is.mobile" />
+          <q-space v-if="!$q.screen.xs" />
           <q-btn
             @click="() => del()"
             v-if="!isNew"
@@ -72,7 +72,7 @@
 </template>
 
 <style>
-.mobile .btn {
+.screen--xs .btn {
   width: 100%;
   margin-top: 8px;
   margin-left: 0px !important;
@@ -117,6 +117,9 @@ const load = async () => {
     $q.loading.show();
     try {
       const docSnap = await getDoc(doc(wordsCol, props.id));
+      if (docSnap.data() === undefined) {
+        throw new Error('docSnap.data() is undefined');
+      }
       title.value = docSnap.data().word1.join(', ');
       word1.value = docSnap.data().word1;
       word2.value = docSnap.data().word2;

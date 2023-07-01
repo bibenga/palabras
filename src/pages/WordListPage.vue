@@ -3,7 +3,7 @@
     <q-table
       ref="tableRef"
       title="Tus palabras para estudiar"
-      :grid="$q.platform.is.mobile"
+      :grid="$q.screen.xs"
       :rows="words"
       :columns="columns"
       row-key="id"
@@ -77,14 +77,48 @@
 
       <template v-slot:body-cell-isLearnedFlg="props">
         <q-td :props="props">
-          <q-icon
-            :name="
-              props.row.isLearnedFlg ? 'check_box' : 'check_box_outline_blank'
-            "
-            size="1.5em"
-          />
+          <q-icon v-if="props.row.isLearnedFlg" name="done" size="1.5em" />
         </q-td>
       </template>
+
+      <!-- <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+          <q-card flat bordered>
+            <q-card-section horizontal class="col-2">
+              <q-card-section>
+                <q-checkbox v-model="props.selected" :label="props.row.name" />
+              </q-card-section>
+              <q-card-section
+                class="col-8 cursor-pointer q-hoverable"
+                @click="rowClicked(props.row)"
+              >
+                <div class="row">
+                  <div class="col-4 text-overline">Word1</div>
+                  <div class="col-8 text-overline">
+                    {{ props.row.word1.join(', ') }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-4 text-overline">Word2</div>
+                  <div class="col-8 text-overline">
+                    {{ props.row.word2.join(', ') }}
+                  </div>
+                </div>
+              </q-card-section>
+              <q-card-section
+                class="col-2 cursor-pointer q-hoverable"
+                @click="rowClicked(props.row)"
+              >
+                <q-icon
+                  v-if="props.row.isLearnedFlg"
+                  name="done"
+                  size="1.5em"
+                />
+              </q-card-section>
+            </q-card-section>
+          </q-card>
+        </div>
+      </template> -->
     </q-table>
 
     <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -100,7 +134,7 @@
 </template>
 
 <style>
-.mobile .btn {
+.screen--xs .btn {
   width: 100%;
   margin-top: 8px;
   margin-left: 0px !important;

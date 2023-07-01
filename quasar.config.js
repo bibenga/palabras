@@ -100,6 +100,9 @@ module.exports = configure(function (/* ctx */) {
     framework: {
       config: {
         dark: 'auto',
+        screen: {
+          bodyClasses: true,
+        },
       },
 
       // iconSet: 'material-icons', // Quasar icon set

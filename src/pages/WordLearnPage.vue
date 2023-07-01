@@ -1,8 +1,6 @@
 <template>
-  <q-page
-    :class="$q.platform.is.mobile ? '' : 'row justify-center items-center'"
-  >
-    <q-card flat :bordered="!$q.platform.is.mobile" class="learn-form">
+  <q-page :class="$q.screen.xs ? '' : 'row justify-center items-center'">
+    <q-card flat :bordered="!$q.screen.xs" class="learn-form">
       <q-card-section>
         <div class="text-h6">Prueba</div>
       </q-card-section>
@@ -60,7 +58,7 @@
           class="btn"
           color="positive"
         />
-        <q-space v-if="!$q.platform.is.mobile" />
+        <q-space v-if="!$q.screen.xs" />
         <q-btn
           v-if="task != null && !answerIsValid"
           @click="() => skipTask()"
@@ -85,15 +83,15 @@
 </template>
 
 <style>
-.mobile .learn-form {
+.screen--xs .learn-form {
   width: 100%;
 }
 
-.desktop .learn-form {
+.learn-form {
   width: 800px;
 }
 
-.mobile .btn {
+.screen--xs .btn {
   width: 100%;
   margin-top: 8px;
   margin-left: 0px !important;

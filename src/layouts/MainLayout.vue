@@ -19,7 +19,7 @@
         </q-btn>
 
         <template v-if="user">
-          <q-tabs v-if="!$q.platform.is.mobile" class="bg-primary text-white">
+          <q-tabs v-if="!$q.screen.xs" class="bg-primary text-white">
             <q-route-tab name="progress" icon="dashboard" to="/progress">
               <q-tooltip class="bg-accent">Progress</q-tooltip>
             </q-route-tab>
@@ -48,7 +48,7 @@
     </q-page-container>
 
     <q-footer
-      v-if="!isAcceptedCookieConsent || (user != null && $q.platform.is.mobile)"
+      v-if="!isAcceptedCookieConsent || (user != null && $q.screen.xs)"
       class="fixed-bottom"
     >
       <q-banner
@@ -68,7 +68,7 @@
           />
         </template>
       </q-banner>
-      <q-toolbar v-if="user != null && $q.platform.is.mobile">
+      <q-toolbar v-if="user != null && $q.screen.xs">
         <q-tabs class="bg-primary text-white" switch-indicator align="justify">
           <q-route-tab name="progress" icon="dashboard" to="/progress">
             <q-tooltip class="bg-accent">Progress</q-tooltip>
