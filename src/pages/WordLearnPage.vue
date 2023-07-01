@@ -8,18 +8,6 @@
       </q-card-section>
 
       <q-card-section>
-        <!-- <q-banner
-          v-if="errorMessage"
-          class="text-white bg-red q-mb-md rounded-borders"
-        >
-          {{ errorMessage }}
-        </q-banner> -->
-
-        <!-- <div>rank: {{ rankDebug }}</div>
-        <div>selected: {{ selectedDebug }}</div>
-        <div>{{ task }}</div> -->
-        <!-- <p>{{ task2.id }} -> {{ task2 }}</p> -->
-
         <p v-if="task != null" style="min-height: 3em">
           <span>
             <span
@@ -74,6 +62,7 @@
         />
         <q-space v-if="!$q.platform.is.mobile" />
         <q-btn
+          v-if="!answerIsValid"
           @click="() => skipTask()"
           label="Saltar"
           unelevated
@@ -82,6 +71,7 @@
           outline
         />
         <q-btn
+          v-if="!answerIsValid"
           @click="() => markAsKnowed()"
           label="¡Lo sé!"
           unelevated
@@ -144,30 +134,44 @@ const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
 
-// const { data: lastTask, pending: loading } = useCollection(
-//   query(
-//     tasksCol,
-//     and(
-//       where('userId', '==', user.value?.uid),
-//       where('isDoneFlg', '==', false),
-//       where('isSkipedFlg', '==', false)
+// const getNextRandomWord = async () => {
+//   const rank = Math.random();
+//   const queries = [
+//     query(
+//       wordsCol,
+//       and(
+//         where('userId', '==', user.value?.uid),
+//         where('isLearnedFlg', '==', false),
+//         where('random', '>=', rank)
+//       ),
+//       orderBy('random', 'asc'),
+//       limit(1)
 //     ),
-//     orderBy('createdTs', 'desc'),
-//     limit(1)
-//   ),
-//   {
-//     ssrKey: 'currentTask',
+//     query(
+//       wordsCol,
+//       and(
+//         where('userId', '==', user.value?.uid),
+//         where('isLearnedFlg', '==', false),
+//         where('random', '<=', rank)
+//       ),
+//       orderBy('random', 'asc'),
+//       limit(1)
+//     ),
+//   ];
+
+//   for (const wordsQuery of queries) {
+//     const randomWords = await getDocs(wordsQuery);
+//     if (!randomWords.empty) {
+//       const wordDoc = randomWords.docs[0];
+//       return {
+//         id: wordDoc.id,
+//         word1: wordDoc.data().word1,
+//         word2: wordDoc.data().word2,
+//       };
+//     }
 //   }
-// );
-// const task2 = computed(() => {
-//   if (!loading.value && lastTask.value.length == 1) {
-//     const res = lastTask.value[0];
-//     console.log('task2', res, res?.id, res);
-//     return res;
-//   }
-//   console.log('task2');
 //   return null;
-// });
+// };
 
 const load = async () => {
   const tasksQuery = query(
@@ -181,7 +185,6 @@ const load = async () => {
     limit(1)
   );
   const tasksSnap = await getDocs(tasksQuery);
-  // let dTask: DocumentData | null;
   if (tasksSnap.size == 0) {
     // [0.3, 0.5, 0.8]
     // 0.9 => '>=' null => '<=' 1
@@ -213,12 +216,12 @@ const load = async () => {
     let randomWords: QuerySnapshot<DocumentData> | null = null;
     for (const wordsQuery of queries) {
       randomWords = await getDocs(wordsQuery);
-      if (randomWords.size == 1) {
+      if (!randomWords.empty) {
         break;
       }
     }
 
-    if (randomWords != null && randomWords.size == 1) {
+    if (randomWords != null && !randomWords.empty) {
       const sWord = randomWords.docs[0];
       console.log(sWord);
       let word1, word2;
@@ -239,11 +242,10 @@ const load = async () => {
         isDoneFlg: false,
         isSkipedFlg: false,
       };
-      // console.log('add', newTask);
       const taskDoc = await addDoc(tasksCol, newTask);
       task.value = {
-        ...newTask,
         id: taskDoc.id,
+        ...newTask,
       };
     } else {
       $q.notify({
@@ -255,8 +257,9 @@ const load = async () => {
   } else {
     const taskDoc = tasksSnap.docs[0];
     task.value = {
-      ...taskDoc.data(),
       id: taskDoc.id,
+      word1: taskDoc.data().word1,
+      word2: taskDoc.data().word2,
     };
   }
   answer.value = '';

@@ -107,33 +107,53 @@ import {
   deleteDoc,
   query,
   DocumentData,
+  onSnapshot,
+  Firestore,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
-import { useCollection, useCurrentUser, useFirestore } from 'vuefire';
+import { inject, onUnmounted, ref } from 'vue';
+import { useCurrentUser } from 'vuefire';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const router = useRouter();
 
 const user = useCurrentUser();
-const firestore = useFirestore();
+const firestore = inject<Firestore>('firestore');
 const wordsCol = collection(firestore, 'words');
 
 const pagination = ref({
   rowsPerPage: 0,
 });
-const wordsDynamicQuery = computed(() => {
-  return query(
-    wordsCol,
-    where('userId', '==', user.value?.uid),
-    orderBy('word1', 'asc')
-  );
+const wordsQuery = query(
+  wordsCol,
+  where('userId', '==', user.value?.uid),
+  orderBy('word1', 'asc')
+);
+
+const loading = ref(true);
+const words = ref([]);
+const selected = ref([]);
+
+// const { data: words, pending: loading } = useCollection(wordsDynamicQuery, {
+//   ssrKey: 'wordsList',
+// });
+
+const unsubscribe = onSnapshot(wordsQuery, (snapshot) => {
+  const res = [];
+  for (const wordDoc of snapshot.docs) {
+    const word = {
+      id: wordDoc.id,
+      word1: wordDoc.data().word1,
+      word2: wordDoc.data().word2,
+      isLearnedFlg: false,
+    };
+    res.push(word);
+  }
+  words.value = res;
+  loading.value = false;
 });
-const { data: words, pending: loading } = useCollection(wordsDynamicQuery, {
-  ssrKey: 'wordsList',
-});
-const selected = ref<DocumentData[]>([]);
+onUnmounted(() => unsubscribe());
 
 const columns = [
   {

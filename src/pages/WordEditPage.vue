@@ -1,10 +1,10 @@
 <template>
-  <q-page v-if="!pending">
+  <q-page v-if="!loading">
     <q-form @submit.prevent="save" class="q-gutter-md">
       <q-card flat>
         <q-card-section>
           <div v-if="isNew" class="text-h6">Add new word</div>
-          <div v-else class="text-h6">Edit {{ label }} word</div>
+          <div v-else class="text-h6">Edit {{ title }} word</div>
         </q-card-section>
 
         <q-card-section>
@@ -81,6 +81,7 @@
 
 <script setup lang="ts">
 import {
+  Firestore,
   addDoc,
   collection,
   deleteDoc,
@@ -89,64 +90,37 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { onMounted, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCurrentUser, useFirestore } from 'vuefire';
+import { useCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
 
 const user = useCurrentUser();
-const firestore = useFirestore();
+const firestore = inject<Firestore>('firestore');
 const wordsCol = collection(firestore, 'words');
 
 const props = defineProps<{
   id: string;
 }>();
 
-const pending = ref(true);
-const label = ref('');
+const loading = ref(true);
+const title = ref('');
 const isNew = props.id == 'new';
 const word1 = ref([]);
 const word2 = ref([]);
 const isLearnedFlg = ref(false);
 
-// if (isNew) {
-//   pending.value = false;
-// } else {
-//   const { data: word, promise } = useDocument(
-//     doc(wordsCol, props.id)
-//   );
-//   onMounted(async () => {
-//     $q.loading.show();
-//     try {
-//       const wordDoc: DocumentData | undefined = await promise.value;
-//       label.value = wordDoc.word1.join(', ');
-//       word1.value = wordDoc.word1;
-//       word2.value = wordDoc.word2;
-//       isLearnedFlg.value = wordDoc.isLearnedFlg;
-//       pending.value = false;
-//     } catch (error) {
-//       console.error(error);
-//     } finally {
-//       $q.loading.hide();
-//     }
-//   });
-// }
-
 const load = async () => {
-  // console.log(props.id, isNew);
   if (!isNew) {
     $q.loading.show();
     try {
       const docSnap = await getDoc(doc(wordsCol, props.id));
-      docSnap.ref;
-      console.log(docSnap.data());
-      const docData = docSnap.data();
-      label.value = docData.word1.join(', ');
-      word1.value = docData.word1;
-      word2.value = docData.word2;
-      isLearnedFlg.value = docData.isLearnedFlg;
+      title.value = docSnap.data().word1.join(', ');
+      word1.value = docSnap.data().word1;
+      word2.value = docSnap.data().word2;
+      isLearnedFlg.value = docSnap.data().isLearnedFlg;
     } catch (error) {
       $q.notify({
         type: 'negative',
@@ -155,12 +129,10 @@ const load = async () => {
       });
       router.push('/word');
     } finally {
-      pending.value = false;
       $q.loading.hide();
     }
-  } else {
-    pending.value = false;
   }
+  loading.value = false;
 };
 
 onMounted(() => {
@@ -168,8 +140,6 @@ onMounted(() => {
 });
 
 const save = async () => {
-  // console.log(`new: ${word1.value}; ${word2.value}; ${isLearnedFlg.value}`);
-
   $q.loading.show();
   try {
     if (isNew) {
