@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { inject, ref } from 'vue';
-import { useQuasar, QInput, QSpinnerGears } from 'quasar';
+import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
 import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
 
@@ -110,10 +110,7 @@ const redirectOnLogin = () => {
 };
 
 const register = () => {
-  $q.loading.show({
-    spinner: QSpinnerGears,
-    message: 'Registering...',
-  });
+  $q.loading.show();
 
   createUserWithEmailAndPassword(fireauth, username.value, password.value)
     .then((userCredential) => {

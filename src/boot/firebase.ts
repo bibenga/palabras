@@ -1,6 +1,12 @@
 import { boot } from 'quasar/wrappers';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { Firestore, getFirestore } from 'firebase/firestore';
+import {
+  Firestore,
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore';
 import { Auth, getAuth } from 'firebase/auth';
 import firebaseConfig from './firebase.json';
 import { VueFire, VueFireAuth, getCurrentUser } from 'vuefire';
@@ -20,6 +26,12 @@ export default boot(async ({ app, router }) => {
   const fireauth = getAuth(firebase);
   fireauth.useDeviceLanguage();
   console.debug('fireauth', fireauth);
+
+  initializeFirestore(firebase, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    }),
+  });
 
   const firestore = getFirestore(firebase);
   console.debug('firestore', firestore);

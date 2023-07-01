@@ -4,17 +4,16 @@
       ref="tableRef"
       title="Tus palabras para estudiar"
       :grid="$q.platform.is.mobile"
-      :rows="rows"
+      :rows="words"
       :columns="columns"
-      square
       row-key="id"
       selection="multiple"
       v-model:selected="selected"
+      virtual-scroll
       v-model:pagination="pagination"
+      :rows-per-page-options="[0]"
       :loading="loading"
-      :filter="filter"
       binary-state-sort
-      @request="onRequest"
       @row-click="(evt, row, index) => rowClicked(row)"
       card-class="no-shadow"
       card-style="border: 1px"
@@ -35,8 +34,8 @@
 
       <template v-slot:top>
         <q-btn
-          v-if="pagination.rowsNumber == 0"
           @click="() => loadDemoData()"
+          v-if="!loading && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
@@ -46,6 +45,7 @@
         />
         <q-btn
           @click="() => add()"
+          v-if="!loading && words.length < 100"
           unelevated
           class="q-ml-sm btn"
           color="primary"
@@ -98,43 +98,43 @@
 </style>
 
 <script setup lang="ts">
-import { query } from 'firebase/database';
 import {
-  Firestore,
   collection,
   orderBy,
   where,
-  getCountFromServer,
   doc,
   addDoc,
   deleteDoc,
-  getDocs,
-  startAt,
-  limit,
-  startAfter,
-  limitToLast,
-  endBefore,
+  query,
+  DocumentData,
 } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, onMounted, ref } from 'vue';
-import { useCurrentUser } from 'vuefire';
+import { computed, ref } from 'vue';
+import { useCollection, useCurrentUser, useFirestore } from 'vuefire';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const router = useRouter();
-const firestore = inject<Firestore>('firestore');
 
 const user = useCurrentUser();
+const firestore = useFirestore();
 
 const pagination = ref({
-  sortBy: 'desc',
-  descending: false,
-  page: 1,
-  rowsPerPage: 5,
-  rowsNumber: 0,
+  rowsPerPage: 0,
 });
+const wordsDynamicQuery = computed(() => {
+  return query(
+    collection(firestore, 'words'),
+    where('userId', '==', user.value?.uid),
+    orderBy('word1', 'asc')
+  );
+});
+const { data: words, pending: loading } = useCollection(wordsDynamicQuery, {
+  ssrKey: 'wordsList',
+});
+const selected = ref<DocumentData[]>([]);
+
 const columns = [
-  // { name: 'id', required: true, label: 'ID', align: 'left' },
   {
     name: 'word1',
     required: true,
@@ -159,98 +159,7 @@ const columns = [
     field: (row) => row.isLearnedFlg,
     format: (val) => (val ? 'yes' : 'no'),
   },
-  { name: 'actions', required: true, label: '', align: 'left' },
 ];
-
-const tableRef = ref();
-const selected = ref([]);
-const loading = ref(false);
-const filter = ref('');
-const rows = ref([]);
-const rowsSnapshot = ref();
-
-const onRequest = async (props) => {
-  var { page, rowsPerPage, sortBy, descending } = props.pagination;
-  const filter = props.filter;
-
-  console.log(
-    `onRequest: user=${user.value?.uid}; ` +
-      `page=${page}; rowsPerPage=${rowsPerPage}; sortBy=${sortBy}; descending=${descending}; filter=${filter}; `
-  );
-
-  loading.value = true;
-
-  try {
-    console.log('rowsSnapshot', rowsSnapshot.value);
-
-    const c = collection(firestore, 'words');
-    // limitToLast(docsLimit), endBefore(snapshot.docs[0])]
-    if (rowsPerPage != pagination.value.rowsPerPage) {
-      rowsSnapshot.value = null;
-    }
-    var que = [];
-    if (rowsSnapshot.value == null) {
-      // first request
-      page = 1;
-      que.push(limit(rowsPerPage));
-    } else {
-      // pagination
-      if (page == pagination.value.page) {
-        // refresh
-        que.push(startAt(rowsSnapshot.value.docs[0]));
-        que.push(limit(rowsPerPage));
-      } else if (page >= pagination.value.page) {
-        // next page
-        que.push(
-          startAfter(rowsSnapshot.value.docs[rowsSnapshot.value.size - 1])
-        );
-        que.push(limit(rowsPerPage));
-      } else {
-        // prev page
-        que.push(endBefore(rowsSnapshot.value.docs[0]));
-        que.push(limitToLast(rowsPerPage));
-      }
-    }
-    const q = query(
-      c,
-      where('userId', '==', user.value?.uid),
-      orderBy('word1', 'asc'),
-      ...que
-    );
-    const s = await getDocs(q);
-    console.log('snapshot', s.size, s);
-    rowsSnapshot.value = s;
-    rows.value = s.docs.map((i) => {
-      return {
-        ...i.data(),
-        id: i.id,
-      };
-    });
-    console.log('rows', rows.value);
-
-    pagination.value.page = page;
-    pagination.value.rowsPerPage = rowsPerPage;
-    pagination.value.sortBy = sortBy;
-    pagination.value.descending = descending;
-
-    if (pagination.value.rowsNumber <= 0) {
-      const qCount = query(c, where('userId', '==', user.value?.uid));
-      const sCount = await getCountFromServer(qCount);
-      pagination.value.rowsNumber = sCount.data().count;
-      console.log('loaded count', pagination.value.rowsNumber);
-    } else {
-      console.log('cached count', pagination.value.rowsNumber);
-    }
-  } catch (error) {
-    console.log('error', error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(() => {
-  tableRef.value.requestServerInteraction();
-});
 
 const loadDemoData = async () => {
   console.log('fakeAdd');
@@ -284,15 +193,11 @@ const loadDemoData = async () => {
       };
       const aword = await addDoc(collection(firestore, 'words'), word);
       console.log('added', word, aword);
-      $q.loadingBar.increment(1);
     }
     $q.notify({
       message: `Was added ${demoPairs.length} word pair`,
       timeout: 2000,
     });
-    pagination.value.rowsNumber = 0;
-    rowsSnapshot.value = null;
-    tableRef.value.requestServerInteraction();
   } finally {
     $q.loading.hide();
   }
@@ -302,10 +207,10 @@ const add = async () => {
   router.push('/word/new');
 };
 
-const edit = (doc) => {
-  console.log('edit', doc.id);
-  router.push(`/word/${doc.id}`);
-};
+// const edit = (doc) => {
+//   console.log('edit', doc.id);
+//   router.push(`/word/${doc.id}`);
+// };
 
 const rowClicked = async (row) => {
   console.log('rowClicked', row.id);
@@ -327,15 +232,11 @@ const del = async () => {
         console.log('del doc', d);
         await deleteDoc(doc(firestore, 'words', d.id));
       }
+      selected.value = [];
       $q.notify({
         message: `Deleted ${docsLength} documents`,
         timeout: 2000,
       });
-
-      selected.value = [];
-      pagination.value.rowsNumber = 0;
-      rowsSnapshot.value = null;
-      tableRef.value.requestServerInteraction();
     } finally {
       $q.loading.hide();
     }

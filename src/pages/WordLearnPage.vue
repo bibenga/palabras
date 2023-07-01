@@ -139,7 +139,6 @@ const task = ref();
 const answerControl = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
-const rankDebug = ref();
 const selectedDebug = ref();
 
 const load = async () => {
@@ -163,7 +162,6 @@ const load = async () => {
     // 0.9 => '>=' null => '<=' 1
     // 0.4 => 1 => 1
     const rank = Math.random();
-    rankDebug.value = rank;
     let qWords = query(
       cWords,
       and(
@@ -218,11 +216,6 @@ const load = async () => {
         id: dTask.id,
       };
       console.log('added', dTask);
-      // $q.notify({
-      //   type: 'danger',
-      //   message: `Ha añadido una tarea ${dTask.id}`,
-      //   timeout: 5000,
-      // });
     } else {
       dTask = null;
       $q.notify({
@@ -238,11 +231,6 @@ const load = async () => {
       ...dTask.data(),
       id: dTask.id,
     };
-    // $q.notify({
-    //   type: 'danger',
-    //   message: `Hay una tarea ${sTasks.docs[0].id}`,
-    //   timeout: 5000,
-    // });
   }
   answer.value = '';
   answerIsValid.value = undefined;
@@ -253,11 +241,15 @@ onMounted(() => {
 
 const skipTask = async () => {
   console.log('skipTask', task.value.id);
-  await setDoc(
-    doc(firestore, 'tasks', task.value.id),
-    { isSkipedFlg: true, updatedTs: new Date() },
-    { merge: true }
-  );
+  try {
+    await setDoc(
+      doc(firestore, 'tasks', task.value.id),
+      { isSkipedFlg: true, updatedTs: new Date() },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error(error);
+  }
   // $q.notify({
   //   type: 'warning',
   //   message: `La tarea ${task.value.id} ha omitido`,
@@ -268,16 +260,24 @@ const skipTask = async () => {
 
 const markAsKnowed = async () => {
   console.log('markAsKnowed', task.value.id, task.value.wordId);
-  await setDoc(
-    doc(firestore, 'tasks', task.value.id),
-    { isSkipedFlg: true, updatedTs: new Date() },
-    { merge: true }
-  );
-  await setDoc(
-    doc(firestore, 'words', task.value.wordId),
-    { isLearnedFlg: true },
-    { merge: true }
-  );
+  try {
+    await setDoc(
+      doc(firestore, 'tasks', task.value.id),
+      { isSkipedFlg: true, updatedTs: new Date() },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error(error);
+  }
+  try {
+    await setDoc(
+      doc(firestore, 'words', task.value.wordId),
+      { isLearnedFlg: true },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error(error);
+  }
   await load();
 };
 

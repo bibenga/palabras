@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { inject, onMounted, ref } from 'vue';
-import { useQuasar, QInput, QSpinnerGears } from 'quasar';
+import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
 import {
   Auth,
@@ -133,11 +133,8 @@ onMounted(async () => {
   }
 });
 
-const login = async () => {
-  $q.loading.show({
-    spinner: QSpinnerGears,
-    message: 'Logining...',
-  });
+const login = () => {
+  $q.loading.show();
 
   signInWithEmailAndPassword(fireauth, username.value, password.value)
     .then((userCredential) => {
@@ -161,7 +158,7 @@ const login = async () => {
     });
 };
 
-const loginWithGoogle = async () => {
+const loginWithGoogle = () => {
   const provider = new GoogleAuthProvider();
   // provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
   // provider.setCustomParameters({

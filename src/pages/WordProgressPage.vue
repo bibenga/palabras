@@ -64,7 +64,9 @@ const qTasks = query(
   orderBy('createdTs', 'desc'),
   limit(20)
 );
-const { data: tasks, pending } = useCollection(qTasks);
+const { data: tasks, pending } = useCollection(qTasks, {
+  ssrKey: 'tasksProgress',
+});
 const tasksByDate = computed(() => {
   const toDate = (d: Date): Date => {
     var c = new Date(d.getTime());
