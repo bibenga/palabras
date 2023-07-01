@@ -106,7 +106,6 @@ import {
   addDoc,
   deleteDoc,
   query,
-  DocumentData,
   onSnapshot,
   Firestore,
 } from 'firebase/firestore';

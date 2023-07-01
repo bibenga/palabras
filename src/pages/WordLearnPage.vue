@@ -102,9 +102,7 @@
 
 <script setup lang="ts">
 import {
-  DocumentData,
   Firestore,
-  QuerySnapshot,
   addDoc,
   and,
   collection,
