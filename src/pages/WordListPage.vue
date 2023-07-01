@@ -86,6 +86,16 @@
         </q-td>
       </template>
     </q-table>
+
+    <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn
+        @click="() => add()"
+        v-if="!loading && words.length < 100"
+        fab
+        icon="add"
+        color="primary"
+      />
+    </q-page-sticky> -->
   </q-page>
 </template>
 
@@ -145,7 +155,7 @@ const unsubscribe = onSnapshot(wordsQuery, (snapshot) => {
       id: wordDoc.id,
       word1: wordDoc.data().word1,
       word2: wordDoc.data().word2,
-      isLearnedFlg: false,
+      isLearnedFlg: wordDoc.data().isLearnedFlg,
     };
     res.push(word);
   }
