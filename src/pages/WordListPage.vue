@@ -56,7 +56,7 @@
           v-if="selected.length > 0"
           @click="() => del()"
           unelevated
-          class="q-ml-sm"
+          class="q-ml-sm btn"
           icon="delete"
           color="negative"
           label="Delete selected"
