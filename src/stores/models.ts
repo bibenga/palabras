@@ -18,5 +18,11 @@ export interface Task {
   isDoneFlg: boolean;
   isSkipedFlg: boolean;
   createdTs: Date;
-  updatedTs?: Date;
+  updatedTs: Date;
+}
+
+export interface TaskProgress {
+  today: Task[];
+  yeasterday: Task[];
+  previously: Task[];
 }

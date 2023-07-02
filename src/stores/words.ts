@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import { inject, ref } from 'vue';
 import {
+  DocumentData,
   Firestore,
+  QueryDocumentSnapshot,
   Unsubscribe,
   addDoc,
   collection,
@@ -33,6 +35,19 @@ export const useWordsStore = defineStore('words', () => {
   let user: User | null = null;
   let wordsUnsubscribe: Unsubscribe | null = null;
 
+  const deserialize = (d: QueryDocumentSnapshot<DocumentData>): Word => {
+    return {
+      id: d.id,
+      userId: d.data().userId,
+      word1: d.data().word1,
+      word2: d.data().word2,
+      isLearnedFlg: d.data().isLearnedFlg,
+      random: d.data().random,
+      createdTs: d.data().createdTs.toDate(),
+      updatedTs: d.data().updatedTs.toDate(),
+    };
+  };
+
   const init = () => {
     console.debug('[words.init]', user?.uid);
     if (user == null) {
@@ -47,20 +62,7 @@ export const useWordsStore = defineStore('words', () => {
     wordsUnsubscribe = onSnapshot(wordsQuery, (snapshot) => {
       const res = [];
       for (const wordDoc of snapshot.docs) {
-        const word: Word = {
-          // id: wordDoc.id,
-          // word1: wordDoc.data().word1,
-          // word2: wordDoc.data().word2,
-          // isLearnedFlg: wordDoc.data().isLearnedFlg,
-          id: wordDoc.id,
-          userId: wordDoc.data().userId,
-          word1: wordDoc.data().word1,
-          word2: wordDoc.data().word2,
-          isLearnedFlg: wordDoc.data().isLearnedFlg,
-          random: wordDoc.data().random,
-          createdTs: wordDoc.data().createdTs,
-          updatedTs: wordDoc.data().updatedTs,
-        };
+        const word: Word = deserialize(wordDoc);
         res.push(word);
       }
       console.debug('[words.onSnapshot]', res);
