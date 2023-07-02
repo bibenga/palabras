@@ -81,8 +81,11 @@
         </q-td>
       </template>
 
-      <!-- <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+      <template v-slot:item="props">
+        <div
+          class="q-pa-xs col-xs-12 col-sm-6 col-md-4"
+          style="overflow: hidden"
+        >
           <q-card flat bordered>
             <q-card-section horizontal class="col-2">
               <q-card-section>
@@ -109,6 +112,12 @@
                 class="col-2 cursor-pointer q-hoverable"
                 @click="rowClicked(props.row)"
               >
+                <div
+                  v-if="props.row.isLearnedFlg"
+                  class="text-overline float-right"
+                >
+                  learned
+                </div>
                 <q-icon
                   v-if="props.row.isLearnedFlg"
                   name="done"
@@ -118,7 +127,7 @@
             </q-card-section>
           </q-card>
         </div>
-      </template> -->
+      </template>
     </q-table>
 
     <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
