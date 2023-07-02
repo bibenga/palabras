@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page v-if="ready">
     <q-table
       ref="tableRef"
       title="Tus palabras para estudiar"
@@ -12,7 +12,7 @@
       virtual-scroll
       v-model:pagination="pagination"
       :rows-per-page-options="[0]"
-      :loading="loading"
+      :loading="!ready"
       binary-state-sort
       @row-click="(evt, row, index) => rowClicked(row)"
       card-class="no-shadow"
@@ -35,7 +35,7 @@
       <template v-slot:top>
         <q-btn
           @click="() => loadDemoData()"
-          v-if="!loading && words.length == 0"
+          v-if="ready && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
@@ -45,7 +45,7 @@
         />
         <q-btn
           @click="() => add()"
-          v-if="!loading && words.length < 100"
+          v-if="ready && words.length < 100"
           unelevated
           class="q-ml-sm btn"
           color="primary"
@@ -151,61 +151,23 @@
 </style>
 
 <script setup lang="ts">
-import {
-  collection,
-  orderBy,
-  where,
-  doc,
-  addDoc,
-  deleteDoc,
-  query,
-  onSnapshot,
-  Firestore,
-} from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { inject, onUnmounted, ref } from 'vue';
-import { useCurrentUser } from 'vuefire';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useWordsStore } from 'src/stores/words';
+import { storeToRefs } from 'pinia';
+import { Word } from 'src/stores/models';
 
 const $q = useQuasar();
 const router = useRouter();
 
-const user = useCurrentUser();
-const firestore = inject<Firestore>('firestore');
-const wordsCol = collection(firestore, 'words');
+const wordsStore = useWordsStore();
+const { words, ready } = storeToRefs(wordsStore);
 
 const pagination = ref({
   rowsPerPage: 0,
 });
-const wordsQuery = query(
-  wordsCol,
-  where('userId', '==', user.value?.uid),
-  orderBy('word1', 'asc')
-);
-
-const loading = ref(true);
-const words = ref([]);
-const selected = ref([]);
-
-// const { data: words, pending: loading } = useCollection(wordsDynamicQuery, {
-//   ssrKey: 'wordsList',
-// });
-
-const unsubscribe = onSnapshot(wordsQuery, (snapshot) => {
-  const res = [];
-  for (const wordDoc of snapshot.docs) {
-    const word = {
-      id: wordDoc.id,
-      word1: wordDoc.data().word1,
-      word2: wordDoc.data().word2,
-      isLearnedFlg: wordDoc.data().isLearnedFlg,
-    };
-    res.push(word);
-  }
-  words.value = res;
-  loading.value = false;
-});
-onUnmounted(() => unsubscribe());
+const selected = ref([] as Word[]);
 
 const columns = [
   {
@@ -239,22 +201,9 @@ const loadDemoData = async () => {
 
   $q.loading.show();
   try {
-    const demoPairs = (await import('./wordPairs.json')).default;
-    console.log('demoPairs', demoPairs);
-    for (const pair of demoPairs) {
-      const word = {
-        userId: user.value?.uid,
-        createdTs: new Date(),
-        word1: pair[0].map((v) => v.toLowerCase()),
-        word2: pair[1].map((v) => v.toLowerCase()),
-        isLearnedFlg: false,
-        random: Math.random(),
-      };
-      const aword = await addDoc(wordsCol, word);
-      // console.log('added', word, aword);
-    }
+    const loaded = await wordsStore.loadDemoWords();
     $q.notify({
-      message: `Was added ${demoPairs.length} word pair`,
+      message: `Was added ${loaded} word pair`,
       timeout: 2000,
     });
   } finally {
@@ -286,14 +235,10 @@ const del = async () => {
   }).onOk(async () => {
     $q.loading.show();
     try {
-      const docsLength = docs.length;
-      for (const d of docs) {
-        console.log('del doc', d);
-        await deleteDoc(doc(wordsCol, d.id));
-      }
+      await wordsStore.deleteWords(docs.map((d) => d.id));
       selected.value = [];
       $q.notify({
-        message: `Deleted ${docsLength} documents`,
+        message: `Deleted ${docs.length} documents`,
         timeout: 2000,
       });
     } finally {
