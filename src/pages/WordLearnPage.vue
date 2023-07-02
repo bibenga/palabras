@@ -18,7 +18,7 @@
             >
               {{ task.word1[0] }}
             </span>
-            <q-tooltip>
+            <q-tooltip :hide-delay="5000">
               {{ task.word2.join(', ') }}
             </q-tooltip>
           </span>
