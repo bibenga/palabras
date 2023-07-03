@@ -4,7 +4,8 @@ hombre - мужчина
 marido - муж
 mujer - женщина, жена
 niño - ребенок
-muchacho/a - мальчик/девочка
+muchacho - мальчик
+muchacha - девочка
 amigo - друг
 invitado - гость
 
@@ -12,12 +13,18 @@ familia - семья
 padres - родители
 padre - отец
 madre - мать
-hijo/a - сын/дочь
-abuelo/a - дед/бабушка
-suegro/a - тесть (свекор)/теща (свекровь)
-tío/a - дядя/тетя
-hermano/a - брат/сестра
-primo/a - двоюродный брат/сестра
+hijo - сын
+hija - дочь
+abuelo - дед
+abuela - бабушка
+suegro - тесть, свекор
+suegra - теща, свекровь
+tío - дядя
+tía - тетя
+hermano - брат
+hermana - сестра
+primo - двоюродный брат
+prima - двоюродный сестра
 
 trabajo - работа
 maestro - учитель
@@ -103,7 +110,7 @@ baya - ягода
 miel - мёд
 mermelada - варенье
 seta - гриб
-cebolla - лук (репчатый)
+cebolla - лук репчатый, репчатый лук
 banana - банан
 zanahoria - морковь
 pera - груша
@@ -179,7 +186,7 @@ minuto - минута
 ayer - вчера
 hoy - сегодня
 mañana - завтра, утро
-fiesta - праздник; вечеринка
+fiesta - праздник, вечеринка
 vez - раз
 
 día - день
@@ -217,7 +224,8 @@ nombre - имя, фамилия
 dirección - адрес
 número - номер
 cumpleaños - день рождения
-casado/a - женатый / замужняя
+casado - женатый
+casada - замужняя
 
 cosa - вещь
 pluma - ручка
@@ -231,18 +239,18 @@ plancha - утюг
 jabón - мыло
 radio - радио
 bolsa - сумка
-mapa - карта; открытка
+mapa - карта, открытка
 maleta - чемодан
 regalo - подарок
-cámara - фотоаппарат; видеокамера
+cámara - фотоаппарат, видеокамера
 ordenador - компьютер
-película - фильм; плёнка
+película - фильм, плёнка
 flor - цветок
 florero - ваза
 cuadro - картина
 pañuelo - носовой платок
 bola - мяч
-globo - воздушный шар(ик)
+globo - воздушный шар, воздушный шарик
 juguete - игрушка
 cuenta - счёт
 sobre - конверт
@@ -290,10 +298,12 @@ yo - я
 tú - ты
 él - он
 ella - она
-usted(es) - Вы (ед.ч./мн.ч.)
+usted - Вы
+ustedes - Вы
 nosotros - мы
 vosotros - вы
-ellos/as - они
+ellos - они
+ellas - они
 
 mi - мой
 tu - твой
@@ -301,7 +311,7 @@ su - его, ее, их, Ваш
 nuestro - наш
 vuestro - ваш
 
-de - из; передает род. падеж
+de - из #передает род. падеж
 a - к
 sobre - на
 debajo de - под
@@ -369,8 +379,8 @@ largo - длинный, долгий
 corto - короткий
 fácil - лёгкий, несложный
 difícil - тяжёлый, трудный
-ligero - легкий (по весу)
-pesado - тяжелый (по весу)
+ligero - легкий, по весу
+pesado - тяжелый, по весу
 oscuro - тёмный
 claro - светлый
 caro - дорогой
@@ -392,7 +402,7 @@ enojado - сердитый
 principal - основной, главный
 
 negro - чёрный
-azul - голубой; синий
+azul - голубой, синий
 marrón - коричневый
 verde - зелёный
 gris - серый
@@ -401,11 +411,11 @@ blanco - белый
 amarillo - жёлтый
 
 sí - да
-no - нет; не
+no - нет, не
 este - этот
 ese - тот
-aquel - тот (дальше чем ese)
-que - что (союз)
+aquel - тот, дальше чем ese
+que - что
 aquí - здесь
 allí - там
 acá- сюда
@@ -413,8 +423,8 @@ allá - туда
 ahora - сейчас, теперь
 ya - уже
 todavía - еще
-mucho/a/s - много
-poco/a/s - мало
+mucho,mucha,muchos,muchas - много
+poco,poca,pocos,pocas - мало
 muy - очень
 cada - каждый
 todos - все
@@ -482,7 +492,7 @@ comer - кушать
 beber - пить
 dar - давать
 hornear - печь
-cocinar - готовить (еду)
+cocinar - готовить
 cortar - резать
 tomar - брать
 esperar - ждать
@@ -490,11 +500,11 @@ leer - читать
 jugar - играть
 fumar - курить
 crear - создавать
-luchar - бороться; драться
+luchar - бороться, драться
 
 gracias - спасибо
-perdón - извини(те)
-por favor - пожалуйста (прошу)
+perdón - извини, извините
+por favor - пожалуйста, прошу
 de nada - пожалуйста, не за что
 qué lástima - жаль
 hasta la vista - до свидания
