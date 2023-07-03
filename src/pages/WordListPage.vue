@@ -35,7 +35,6 @@
       <template v-slot:top>
         <q-btn
           @click="() => loadDemoData()"
-          v-if="ready && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"

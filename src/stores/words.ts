@@ -14,6 +14,7 @@ import {
   query,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { Word } from './models';
@@ -164,22 +165,45 @@ export const useWordsStore = defineStore('words', () => {
   };
 
   const deleteWords = async (ids: string[]): Promise<void> => {
+    const batch = writeBatch(firestore);
     for (const id of ids) {
-      await deleteWord(id);
+      const laRef = doc(wordsCol, id);
+      batch.delete(laRef);
     }
+    await batch.commit();
   };
 
   const loadDemoWords = async (): Promise<number> => {
-    const demoPairs = (await import('./wordPairs.json')).default;
-    // console.log('demoPairs', demoPairs);
-    for (const pair of demoPairs) {
-      await createWord(
-        pair[0].map((v) => v.toLowerCase()),
-        pair[1].map((v) => v.toLowerCase()),
-        false
-      );
+    try {
+      const newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
+      const newWords = newWordsRaw
+        .toLowerCase()
+        .split(/[\r\n]+/)
+        .map((line) => line.trim())
+        .filter((line) => line.length == 0 || !line.startsWith('#'))
+        .map((line) => line.split(/\s*-\s*/))
+        .filter((line) => line.length == 2)
+        .map((line) => [line[0].split(/\s*,\s*/), line[1].split(/\s*,\s*/)]);
+
+      const batch = writeBatch(firestore);
+      for (const pair of newWords) {
+        const wordDoc = doc(wordsCol);
+        batch.set(wordDoc, {
+          userId: user?.uid || '',
+          word1: pair[0],
+          word2: pair[1],
+          isLearnedFlg: false,
+          random: Math.random(),
+          createdTs: new Date(),
+          updatedTs: new Date(),
+        });
+      }
+      await batch.commit();
+      return newWords.length;
+    } catch (error) {
+      console.error(error);
+      return -1;
     }
-    return demoPairs.length;
   };
 
   return {
