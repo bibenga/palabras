@@ -72,7 +72,7 @@ export const useTasksStore = defineStore('tasks', () => {
       tasksCol,
       and(where('userId', '==', user.uid)),
       orderBy('createdTs', 'desc'),
-      limit(20)
+      limit(100)
     );
     tasksUnsubscribe = onSnapshot(tasksQuery, (snapshot) => {
       console.debug('[tasks.onSnapshot]', snapshot);
