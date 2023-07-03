@@ -1,8 +1,19 @@
 # Palabras (quasar-project)
 
+## Deploy in firebase
+
+Install dependendies
+
+```bash
 npm install -g firebase-tools
+```
+
+Deloy
+
+```bash
 npm run build
 firebase deploy
+```
 
 ## Install the dependencies
 
