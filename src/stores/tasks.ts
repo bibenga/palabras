@@ -6,7 +6,6 @@ import {
   QueryDocumentSnapshot,
   Unsubscribe,
   addDoc,
-  and,
   collection,
   doc,
   limit,
@@ -36,7 +35,6 @@ export const useTasksStore = defineStore('tasks', () => {
   const tasks = ref<TaskProgress | null>(null);
 
   let user: User | null = null;
-  let tasksUnsubscribe: Unsubscribe | null = null;
 
   const oneDay = 24 * 60 * 60 * 1000;
   const toDate = (d: Date): Date => {
@@ -57,10 +55,11 @@ export const useTasksStore = defineStore('tasks', () => {
       isDoneFlg: d.data().isDoneFlg,
       isSkipedFlg: d.data().isSkipedFlg,
       createdTs: d.data().createdTs.toDate(),
-      updatedTs: d.data().updatedTs.toDate(),
+      updatedTs: d.data().updatedTs?.toDate() || d.data().createdTs.toDate(),
     };
   };
 
+  let tasksUnsubscribe: Unsubscribe | null = null;
   const init = () => {
     console.debug('[tasks.init]', user?.uid);
     if (user == null) {
@@ -70,14 +69,19 @@ export const useTasksStore = defineStore('tasks', () => {
     }
     const tasksQuery = query(
       tasksCol,
-      and(where('userId', '==', user.uid)),
+      where('userId', '==', user.uid),
       orderBy('createdTs', 'desc'),
-      limit(20)
+      limit(100)
     );
     tasksUnsubscribe = onSnapshot(tasksQuery, (snapshot) => {
       console.debug('[tasks.onSnapshot]', snapshot);
       if (!snapshot.empty) {
-        task.value = deserialize(snapshot.docs[0]);
+        const t = deserialize(snapshot.docs[0]);
+        if (!t.isDoneFlg && !t.isSkipedFlg) {
+          task.value = t;
+        } else {
+          task.value = null;
+        }
 
         const now = toDate(new Date());
         const today = [];
@@ -85,7 +89,7 @@ export const useTasksStore = defineStore('tasks', () => {
         const previously = [];
         for (const taskDoc of snapshot.docs) {
           const t = deserialize(taskDoc);
-          const tDate = toDate(task.value.createdTs);
+          const tDate = toDate(t.createdTs);
           if (now.getTime() - tDate.getTime() == 0) {
             today.push(t);
           } else if (now.getTime() - tDate.getTime() == oneDay) {
@@ -95,6 +99,7 @@ export const useTasksStore = defineStore('tasks', () => {
           }
         }
         tasks.value = { today, yeasterday, previously };
+        console.debug('tasks', tasks.value);
       } else {
         tasks.value = null;
         task.value = null;
@@ -123,8 +128,10 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   });
 
-  const next = async (): Promise<void> => {
+  const newTask = async (): Promise<boolean> => {
     const t = task.value;
+    const wordId = t?.wordId;
+
     if (t != null) {
       if (!t.isSkipedFlg && !t.isDoneFlg) {
         await updateDoc(doc(tasksCol, t.id), {
@@ -134,7 +141,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     }
 
-    const word = await wordStore.randomWord();
+    const word = await wordStore.randomWord(wordId);
     if (word != null) {
       let word1, word2;
       if (Math.random() >= 0.5) {
@@ -156,7 +163,7 @@ export const useTasksStore = defineStore('tasks', () => {
       });
     }
 
-    return;
+    return word != null;
   };
 
   const markAsLearned = async () => {
@@ -186,7 +193,7 @@ export const useTasksStore = defineStore('tasks', () => {
   // const convert = (s: string) => s.toLowerCase().normalize('NFKD').split(splitRule);
   const convert = (s: string): string[] =>
     deburr(s.toLowerCase()).split(splitRule);
-  const validate = async (answer: string): Promise<boolean> => {
+  const validateAnswer = async (answer: string): Promise<boolean> => {
     const t = task.value;
     if (t == null) {
       return false;
@@ -216,8 +223,8 @@ export const useTasksStore = defineStore('tasks', () => {
     ready,
     task,
     tasks,
-    next,
+    newTask,
     markAsLearned,
-    validate,
+    validateAnswer,
   };
 });

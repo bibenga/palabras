@@ -1,5 +1,5 @@
 <template>
-  <q-page v-if="!loading">
+  <q-page v-if="ready">
     <q-form @submit.prevent="save" class="q-gutter-md">
       <q-card flat>
         <q-card-section>
@@ -80,50 +80,40 @@
 </style>
 
 <script setup lang="ts">
-import {
-  Firestore,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from 'firebase/firestore';
+import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
-import { inject, onMounted, ref } from 'vue';
+import { useWordsStore } from 'src/stores/words';
+import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
 
-const user = useCurrentUser();
-const firestore = inject<Firestore>('firestore');
-const wordsCol = collection(firestore, 'words');
+const wordsStore = useWordsStore();
+const { ready } = storeToRefs(wordsStore);
 
 const props = defineProps<{
   id: string;
 }>();
 
-const loading = ref(true);
 const title = ref('');
 const isNew = props.id == 'new';
-const word1 = ref([]);
-const word2 = ref([]);
+const word1 = ref([] as string[]);
+const word2 = ref([] as string[]);
 const isLearnedFlg = ref(false);
 
 const load = async () => {
   if (!isNew) {
     $q.loading.show();
     try {
-      const docSnap = await getDoc(doc(wordsCol, props.id));
-      if (docSnap.data() === undefined) {
-        throw new Error('docSnap.data() is undefined');
+      const word = wordsStore.getWord(props.id);
+      if (word == null) {
+        throw new Error('unknown word');
       }
-      title.value = docSnap.data().word1.join(', ');
-      word1.value = docSnap.data().word1;
-      word2.value = docSnap.data().word2;
-      isLearnedFlg.value = docSnap.data().isLearnedFlg;
+      title.value = word.word1.join(', ');
+      word1.value = word.word1;
+      word2.value = word.word2;
+      isLearnedFlg.value = word.isLearnedFlg;
     } catch (error) {
       $q.notify({
         type: 'negative',
@@ -135,11 +125,18 @@ const load = async () => {
       $q.loading.hide();
     }
   }
-  loading.value = false;
 };
 
 onMounted(() => {
-  load();
+  watch(
+    ready,
+    (v) => {
+      if (v) {
+        load();
+      }
+    },
+    { immediate: true }
+  );
 });
 
 const save = async () => {
@@ -147,24 +144,22 @@ const save = async () => {
   try {
     if (isNew) {
       try {
-        await addDoc(wordsCol, {
-          userId: user.value?.uid,
-          createdTs: new Date(),
-          word1: word1.value,
-          word2: word2.value,
-          isLearnedFlg: isLearnedFlg.value,
-          random: Math.random(),
-        });
+        await wordsStore.createWord(
+          word1.value,
+          word2.value,
+          isLearnedFlg.value
+        );
       } catch (error) {
         console.error(error);
       }
     } else {
       try {
-        await updateDoc(doc(wordsCol, props.id), {
-          word1: word1.value,
-          word2: word2.value,
-          isLearnedFlg: isLearnedFlg.value,
-        });
+        await wordsStore.updateWord(
+          props.id,
+          word1.value,
+          word2.value,
+          isLearnedFlg.value
+        );
       } catch (error) {
         console.error(error);
       }
@@ -189,7 +184,7 @@ const del = async () => {
     $q.loading.show();
     try {
       console.log('del doc', props.id);
-      await deleteDoc(doc(wordsCol, props.id));
+      wordsStore.deleteWord(props.id);
       $q.notify({
         message: 'The document was deleted',
         timeout: 2000,

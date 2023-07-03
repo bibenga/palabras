@@ -33,7 +33,6 @@ export const useWordsStore = defineStore('words', () => {
   const words = ref([] as Word[]);
 
   let user: User | null = null;
-  let wordsUnsubscribe: Unsubscribe | null = null;
 
   const deserialize = (d: QueryDocumentSnapshot<DocumentData>): Word => {
     return {
@@ -44,13 +43,15 @@ export const useWordsStore = defineStore('words', () => {
       isLearnedFlg: d.data().isLearnedFlg,
       random: d.data().random,
       createdTs: d.data().createdTs.toDate(),
-      updatedTs: d.data().updatedTs.toDate(),
+      updatedTs: d.data().updatedTs?.toDate() || d.data().createdTs.toDate(),
     };
   };
 
+  let wordsUnsubscribe: Unsubscribe | null = null;
   const init = () => {
     console.debug('[words.init]', user?.uid);
     if (user == null) {
+      ready.value = false;
       words.value = [];
       return;
     }
@@ -103,10 +104,20 @@ export const useWordsStore = defineStore('words', () => {
     return null;
   };
 
-  const randomWord = async (): Promise<Word | null> => {
+  const randomWord = async (
+    wordId: string | null | undefined
+  ): Promise<Word | null> => {
     const items = words.value;
     if (items != null && items.length > 0) {
-      return items[Math.floor(Math.random() * items.length)];
+      if (items.length == 1) {
+        return items[0];
+      }
+      while (true) {
+        const selected = items[Math.floor(Math.random() * items.length)];
+        if (selected.id != wordId) {
+          return selected;
+        }
+      }
     }
     return null;
   };
@@ -158,6 +169,19 @@ export const useWordsStore = defineStore('words', () => {
     }
   };
 
+  const loadDemoWords = async (): Promise<number> => {
+    const demoPairs = (await import('./wordPairs.json')).default;
+    // console.log('demoPairs', demoPairs);
+    for (const pair of demoPairs) {
+      await createWord(
+        pair[0].map((v) => v.toLowerCase()),
+        pair[1].map((v) => v.toLowerCase()),
+        false
+      );
+    }
+    return demoPairs.length;
+  };
+
   return {
     ready,
     words,
@@ -168,5 +192,6 @@ export const useWordsStore = defineStore('words', () => {
     markWordAsLearned,
     deleteWord,
     deleteWords,
+    loadDemoWords,
   };
 });
