@@ -35,6 +35,7 @@
       <template v-slot:top>
         <q-btn
           @click="() => loadDemoData()"
+          v-if="ready && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
@@ -44,7 +45,7 @@
         />
         <q-btn
           @click="() => add()"
-          v-if="ready && words.length < 100"
+          v-if="ready && words.length < 1000"
           unelevated
           class="q-ml-sm btn"
           color="primary"
