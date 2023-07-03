@@ -6,7 +6,6 @@ import {
   QueryDocumentSnapshot,
   Unsubscribe,
   addDoc,
-  and,
   collection,
   doc,
   limit,
@@ -70,7 +69,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
     const tasksQuery = query(
       tasksCol,
-      and(where('userId', '==', user.uid)),
+      where('userId', '==', user.uid),
       orderBy('createdTs', 'desc'),
       limit(100)
     );
