@@ -5,8 +5,11 @@
   >
     <q-card flat :bordered="!$q.screen.xs" class="learn-form">
       <q-card-section>
-        <div class="text-h6">Prueba</div>
+        <div class="text-h6">Ejercicio</div>
+        <div class="text-overline">escribe una traducción</div>
       </q-card-section>
+
+      <q-separator />
 
       <q-card-section>
         <p v-if="task != null" style="min-height: 3em">
@@ -42,7 +45,7 @@
         </div>
       </q-card-section>
 
-      <q-separator v-if="$q.platform.is.desktop" />
+      <q-separator />
 
       <q-card-actions>
         <q-btn
