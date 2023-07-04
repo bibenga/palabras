@@ -106,7 +106,7 @@ export const useWordsStore = defineStore('words', () => {
   };
 
   const randomWord = async (
-    wordId: string | null | undefined
+    ignoreIds: string[] | null | undefined
   ): Promise<Word | null> => {
     const items = words.value;
     if (items != null && items.length > 0) {
@@ -115,12 +115,37 @@ export const useWordsStore = defineStore('words', () => {
       }
       while (true) {
         const selected = items[Math.floor(Math.random() * items.length)];
-        if (selected.id != wordId) {
+        if (ignoreIds && !ignoreIds.includes(selected.id)) {
           return selected;
         }
       }
     }
     return null;
+  };
+
+  const randomWords = (
+    expected: number,
+    ignoreIds: string[] | null | undefined
+  ): Word[] => {
+    let items = [...words.value];
+    // console.log('1', items);
+    if (ignoreIds) {
+      items = items.filter((item) => !ignoreIds.includes(item.id));
+    }
+    // console.log('2', items);
+    const res = [] as Word[];
+    console.log(
+      `start: res.length=${res.length}, items.length=${items.length}`
+    );
+    while (res.length <= expected && items.length > 0) {
+      console.log(
+        `iter: res.length=${res.length}, items.length=${items.length}`
+      );
+      const index = Math.floor(Math.random() * items.length);
+      res.push(items[index]);
+      items.splice(index, 1);
+    }
+    return res;
   };
 
   const createWord = async (
@@ -211,6 +236,7 @@ export const useWordsStore = defineStore('words', () => {
     words,
     getWord,
     randomWord,
+    randomWords,
     createWord,
     updateWord,
     markWordAsLearned,

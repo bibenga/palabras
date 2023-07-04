@@ -26,6 +26,9 @@
             <q-route-tab name="learn" icon="school" to="/learn">
               <q-tooltip class="bg-accent">Learn words</q-tooltip>
             </q-route-tab>
+            <q-route-tab name="learn2" icon="school" to="/learn2">
+              <q-tooltip class="bg-accent">Learn words 2</q-tooltip>
+            </q-route-tab>
             <q-route-tab name="word" icon="view_list" to="/word">
               <q-tooltip class="bg-accent">Add or remove words</q-tooltip>
             </q-route-tab>
@@ -75,6 +78,9 @@
           </q-route-tab>
           <q-route-tab name="learn" icon="school" to="/learn">
             <q-tooltip class="bg-accent">Learn words</q-tooltip>
+          </q-route-tab>
+          <q-route-tab name="learn2" icon="school" to="/learn2">
+            <q-tooltip class="bg-accent">Learn words 2</q-tooltip>
           </q-route-tab>
           <q-route-tab name="word" icon="view_list" to="/word">
             <q-tooltip class="bg-accent">Add or remove words</q-tooltip>

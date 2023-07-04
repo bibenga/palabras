@@ -28,6 +28,11 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'learn2',
+        component: () => import('pages/WordLearn2Page.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'progress',
         component: () => import('pages/WordProgressPage.vue'),
         meta: { requiresAuth: true },

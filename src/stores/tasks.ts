@@ -130,7 +130,6 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const newTask = async (): Promise<boolean> => {
     const t = task.value;
-    const wordId = t?.wordId;
 
     if (t != null) {
       if (!t.isSkipedFlg && !t.isDoneFlg) {
@@ -141,7 +140,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     }
 
-    const word = await wordStore.randomWord(wordId);
+    const word = await wordStore.randomWord(t ? [t.wordId] : null);
     if (word != null) {
       let word1, word2;
       if (Math.random() >= 0.5) {
