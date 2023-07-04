@@ -9,9 +9,7 @@
       row-key="id"
       selection="multiple"
       v-model:selected="selected"
-      virtual-scroll
       v-model:pagination="pagination"
-      :rows-per-page-options="[0]"
       :loading="!ready"
       binary-state-sort
       @row-click="(evt, row, index) => rowClicked(row)"
@@ -88,41 +86,26 @@
         >
           <q-card flat bordered>
             <q-card-section horizontal class="col-2">
-              <q-card-section>
+              <q-card-section class="q-pa-xs">
                 <q-checkbox v-model="props.selected" :label="props.row.name" />
               </q-card-section>
               <q-card-section
-                class="col-8 cursor-pointer q-hoverable"
+                class="q-pa-xs col-8 cursor-pointer q-hoverable"
                 @click="rowClicked(props.row)"
               >
                 <div class="row">
-                  <div class="col-4 text-overline">Word1</div>
-                  <div class="col-8 text-overline">
-                    {{ props.row.word1.join(', ') }}
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-4 text-overline">Word2</div>
-                  <div class="col-8 text-overline">
+                  <div class="col-10">
+                    {{ props.row.word1.join(', ') }} <br />
                     {{ props.row.word2.join(', ') }}
                   </div>
+                  <div class="col-2">
+                    <q-icon
+                      v-if="props.row.isLearnedFlg"
+                      name="done"
+                      size="1.5em"
+                    />
+                  </div>
                 </div>
-              </q-card-section>
-              <q-card-section
-                class="col-2 cursor-pointer q-hoverable"
-                @click="rowClicked(props.row)"
-              >
-                <div
-                  v-if="props.row.isLearnedFlg"
-                  class="text-overline float-right"
-                >
-                  learned
-                </div>
-                <q-icon
-                  v-if="props.row.isLearnedFlg"
-                  name="done"
-                  size="1.5em"
-                />
               </q-card-section>
             </q-card-section>
           </q-card>
@@ -165,9 +148,7 @@ const router = useRouter();
 const wordsStore = useWordsStore();
 const { words, ready } = storeToRefs(wordsStore);
 
-const pagination = ref({
-  rowsPerPage: 0,
-});
+const pagination = ref({});
 const selected = ref([] as Word[]);
 
 const filter = ref('');
