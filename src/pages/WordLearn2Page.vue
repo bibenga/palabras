@@ -3,7 +3,7 @@
     v-if="ready"
     :class="$q.screen.xs ? '' : 'row justify-center items-center'"
   >
-    <q-card flat :bordered="!$q.screen.xs">
+    <q-card flat :bordered="!$q.screen.xs" class="learn2-form">
       <q-card-section>
         <div class="text-h6">Ejercicio v2</div>
         <div class="text-overline">recoger las palabras</div>
@@ -60,7 +60,21 @@
   </q-page>
 </template>
 
-<style></style>
+<style>
+.screen--xs .learn2-form {
+  width: 100%;
+}
+
+.learn2-form {
+  width: 600px;
+}
+
+.screen--xs .btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-left: 0px !important;
+}
+</style>
 
 <script setup lang="ts">
 import { useWordsStore } from 'src/stores/words';
