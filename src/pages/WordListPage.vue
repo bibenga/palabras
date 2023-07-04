@@ -90,15 +90,15 @@
                 <q-checkbox v-model="props.selected" :label="props.row.name" />
               </q-card-section>
               <q-card-section
-                class="q-pa-xs col-8 cursor-pointer q-hoverable"
+                class="q-pa-xs col-10 cursor-pointer q-hoverable"
                 @click="rowClicked(props.row)"
               >
                 <div class="row">
-                  <div class="col-10">
+                  <div class="col-11">
                     {{ props.row.word1.join(', ') }} <br />
                     {{ props.row.word2.join(', ') }}
                   </div>
-                  <div class="col-2">
+                  <div class="col-1">
                     <q-icon
                       v-if="props.row.isLearnedFlg"
                       name="done"
