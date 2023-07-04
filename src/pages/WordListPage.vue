@@ -4,7 +4,7 @@
       ref="tableRef"
       title="Tus palabras para estudiar"
       :grid="$q.screen.xs"
-      :rows="words"
+      :rows="wordsFiltered"
       :columns="columns"
       row-key="id"
       selection="multiple"
@@ -61,18 +61,18 @@
           color="negative"
           label="Delete selected"
         />
-        <!-- <q-space />
+        <q-space v-if="!$q.screen.xs" />
         <q-input
-          borderless
           dense
-          debounce="300"
+          debounce="500"
           color="primary"
           v-model="filter"
+          :style="$q.screen.xs ? 'width: 100%' : ''"
         >
           <template v-slot:append>
             <q-icon name="search" />
           </template>
-        </q-input> -->
+        </q-input>
       </template>
 
       <template v-slot:body-cell-isLearnedFlg="props">
@@ -152,11 +152,12 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useWordsStore } from 'src/stores/words';
 import { storeToRefs } from 'pinia';
 import { Word } from 'src/stores/models';
+import deburr from 'lodash/deburr';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -168,6 +169,33 @@ const pagination = ref({
   rowsPerPage: 0,
 });
 const selected = ref([] as Word[]);
+
+const filter = ref('');
+const wordsFiltered = computed<Word[]>(() => {
+  console.log('filter', filter.value);
+  if (filter.value == '') {
+    return words.value;
+  }
+
+  const convert = (s: string): string => deburr(s.toLowerCase());
+  const filterValue = convert(filter.value);
+  const match = (items: string[]): boolean => {
+    for (const itemRaw of items) {
+      const item = convert(itemRaw);
+      if (item.indexOf(filterValue) >= 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+  const res = [] as Word[];
+  for (const pair of words.value) {
+    if (match(pair.word1) || match(pair.word2)) {
+      res.push(pair);
+    }
+  }
+  return res;
+});
 
 const columns = [
   {
