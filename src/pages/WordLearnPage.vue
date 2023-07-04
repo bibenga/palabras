@@ -68,7 +68,7 @@
           label="Saltar"
           unelevated
           class="btn"
-          color="secondary"
+          color="primary"
           outline
         />
         <q-btn
@@ -77,7 +77,7 @@
           label="¡Lo sé!"
           unelevated
           class="btn"
-          color="secondary"
+          color="primary"
           outline
         />
       </q-card-actions>

@@ -9,6 +9,7 @@
             v-bind:key="task.id"
             :title="task.word1.join(', ')"
             :subtitle="formatTimeAgo(task.createdTs)"
+            color="primary"
             :icon="task.isDoneFlg ? 'done' : task.isSkipedFlg ? 'remove' : ''"
           />
         </template>
@@ -20,6 +21,7 @@
             v-bind:key="task.id"
             :title="task.word1.join(', ')"
             :subtitle="formatDate(task.createdTs, 'H:mm')"
+            color="primary"
             :icon="task.isDoneFlg ? 'done' : task.isSkipedFlg ? 'remove' : ''"
           />
         </template>
@@ -31,6 +33,7 @@
             v-bind:key="task.id"
             :title="task.word1.join(', ')"
             :subtitle="formatDate(task.createdTs, 'D MMMM H:mm')"
+            color="primary"
             :icon="task.isDoneFlg ? 'done' : task.isSkipedFlg ? 'remove' : ''"
           />
         </template>
