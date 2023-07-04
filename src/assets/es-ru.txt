@@ -385,7 +385,7 @@ oscuro - тёмный
 claro - светлый
 caro - дорогой
 barato - дешёвый
-a la izquierda - cлева
+a la izquierda - слева
 a la derecha - справа
 correcto - правильный
 rápido - быстрый
