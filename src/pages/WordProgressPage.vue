@@ -10,7 +10,13 @@
             :title="task.word1.join(', ')"
             :subtitle="formatTimeAgo(task.createdTs)"
             color="primary"
-            :icon="task.isDoneFlg ? 'done' : task.isSkipedFlg ? 'remove' : ''"
+            :icon="
+              task.isDoneFlg
+                ? 'done'
+                : task.isSkipedFlg
+                ? 'remove'
+                : 'question_mark'
+            "
           />
         </template>
 
