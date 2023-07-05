@@ -169,7 +169,7 @@ const getColor = (wordId: string, selectedWordId: string): string => {
 
 const getOutline = (wordId: string, selectedWordId: string): boolean => {
   if (correct.value.includes(wordId)) {
-    return false;
+    return true;
   }
   return wordId != selectedWordId;
 };
