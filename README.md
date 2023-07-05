@@ -1,5 +1,8 @@
 # Palabras (quasar-project)
 
+En hipoteticamente este proyecto no necesita firebase y la autenticación,
+pero fuieron muy interesante para mi
+
 ## Deploy in firebase
 
 Install dependendies
