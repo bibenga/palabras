@@ -36,6 +36,38 @@
         </div>
       </q-card-section>
 
+      <!-- <q-card-section class="q-pa-none">
+        <q-card-section horizontal class="q-pa-none row">
+          <q-card-section class="q-pa-none col-6">
+            <div v-for="card in cards" :key="card.id" class="q-pa-xs">
+              <q-btn
+                style="width: 100%; font-size: 1.2em"
+                :outline="getOutline(card.word1Id, word1Selected)"
+                :disable="getDisabled(card.word1Id, word1Selected)"
+                :color="getColor(card.word1Id, word1Selected)"
+                :label="card.word1"
+                @click="() => word1Clicked(card)"
+              />
+            </div>
+          </q-card-section>
+
+          <q-separator vertical />
+
+          <q-card-section class="q-pa-none col-6">
+            <div v-for="card in cards" :key="card.id" class="q-pa-xs">
+              <q-btn
+                style="width: 100%; font-size: 1.2em"
+                :outline="getOutline(card.word2Id, word2Selected)"
+                :disable="getDisabled(card.word2Id, word2Selected)"
+                :color="getColor(card.word2Id, word2Selected)"
+                :label="card.word2"
+                @click="() => word2Clicked(card)"
+              />
+            </div>
+          </q-card-section>
+        </q-card-section>
+      </q-card-section> -->
+
       <q-separator />
 
       <q-card-actions>
@@ -87,7 +119,7 @@ const $q = useQuasar();
 const wordsStore = useWordsStore();
 const { ready } = storeToRefs(wordsStore);
 
-const cards = ref([]);
+const cards = ref<object[]>([]);
 const correct = ref<string[]>([]);
 const incorrect = ref(false);
 const word1Selected = ref('');
