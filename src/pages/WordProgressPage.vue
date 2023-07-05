@@ -17,7 +17,21 @@
                 ? 'remove'
                 : 'question_mark'
             "
-          />
+          >
+            <template v-slot:title>
+              <span
+                style="
+                  text-decoration-line: underline;
+                  text-decoration-style: dotted;
+                "
+              >
+                {{ task.word1.join(', ') }}
+                <q-tooltip :hide-delay="$q.screen.xs ? 5000 : 0">
+                  {{ task.word2.join(', ') }}
+                </q-tooltip>
+              </span>
+            </template>
+          </q-timeline-entry>
         </template>
 
         <template v-if="tasks.yeasterday.length > 0">
