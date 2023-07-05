@@ -125,7 +125,7 @@
   </q-page>
 </template>
 
-<style>
+<style scoped>
 .screen--xs .btn {
   width: 100%;
   margin-top: 8px;

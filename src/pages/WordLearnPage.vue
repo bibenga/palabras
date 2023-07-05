@@ -88,7 +88,7 @@
   </q-page>
 </template>
 
-<style>
+<style scoped>
 .screen--xs .learn-form {
   width: 100%;
 }
