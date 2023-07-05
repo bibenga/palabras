@@ -128,19 +128,11 @@ export const useWordsStore = defineStore('words', () => {
     ignoreIds: string[] | null | undefined
   ): Word[] => {
     let items = [...words.value];
-    // console.log('1', items);
     if (ignoreIds) {
       items = items.filter((item) => !ignoreIds.includes(item.id));
     }
-    // console.log('2', items);
     const res = [] as Word[];
-    console.log(
-      `start: res.length=${res.length}, items.length=${items.length}`
-    );
     while (res.length <= expected && items.length > 0) {
-      console.log(
-        `iter: res.length=${res.length}, items.length=${items.length}`
-      );
       const index = Math.floor(Math.random() * items.length);
       res.push(items[index]);
       items.splice(index, 1);

@@ -12,7 +12,7 @@
       <q-separator />
 
       <q-card-section>
-        <div v-for="card in cards" :key="card.id" class="row">
+        <div v-for="(card, index) in cards" :key="index" class="row">
           <div class="col-6 q-pa-xs">
             <q-btn
               style="width: 100%; font-size: 1.2em"
@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import { useWordsStore } from 'src/stores/words';
 import { storeToRefs } from 'pinia';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
@@ -206,6 +206,7 @@ const getOutline = (wordId: string, selectedWordId: string): boolean => {
   return wordId != selectedWordId;
 };
 
+let errorTimer = null;
 const validate = () => {
   if (word1Selected.value === '' || word2Selected.value === '') {
     return;
@@ -216,13 +217,20 @@ const validate = () => {
     word2Selected.value = '';
   } else {
     incorrect.value = true;
-    setTimeout(() => {
+    errorTimer = setTimeout(() => {
       word1Selected.value = '';
       word2Selected.value = '';
       incorrect.value = false;
-    }, 2000);
+      errorTimer = null;
+    }, 1500);
   }
 };
+onUnmounted(() => {
+  if (!!errorTimer) {
+    clearTimeout(errorTimer);
+    errorTimer = null;
+  }
+});
 
 const word1Clicked = (card) => {
   if (word1Selected.value == card.word1Id) {
