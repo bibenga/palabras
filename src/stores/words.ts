@@ -132,7 +132,7 @@ export const useWordsStore = defineStore('words', () => {
       items = items.filter((item) => !ignoreIds.includes(item.id));
     }
     const res = [] as Word[];
-    while (res.length <= expected && items.length > 0) {
+    while (res.length < expected && items.length > 0) {
       const index = Math.floor(Math.random() * items.length);
       res.push(items[index]);
       items.splice(index, 1);
