@@ -71,7 +71,7 @@ export const useTasksStore = defineStore('tasks', () => {
       tasksCol,
       where('userId', '==', user.uid),
       orderBy('createdTs', 'desc'),
-      limit(100)
+      limit(100),
     );
     tasksUnsubscribe = onSnapshot(tasksQuery, (snapshot) => {
       console.debug('[tasks.onSnapshot]', snapshot);
@@ -122,6 +122,7 @@ export const useTasksStore = defineStore('tasks', () => {
     user = authUser;
     console.debug('[tasks.onAuthStateChanged]', authUser?.uid);
     if (user) {
+      cleanup();
       init();
     } else {
       cleanup();
