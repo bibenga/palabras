@@ -59,7 +59,7 @@ export const useWordsStore = defineStore('words', () => {
     const wordsQuery = query(
       wordsCol,
       where('userId', '==', user.uid),
-      orderBy('word1', 'asc')
+      orderBy('word1', 'asc'),
     );
     wordsUnsubscribe = onSnapshot(wordsQuery, (snapshot) => {
       const res = [];
@@ -106,7 +106,7 @@ export const useWordsStore = defineStore('words', () => {
   };
 
   const randomWord = async (
-    ignoreIds: string[] | null | undefined
+    ignoreIds: string[] | null | undefined,
   ): Promise<Word | null> => {
     const items = words.value;
     if (items != null && items.length > 0) {
@@ -115,7 +115,9 @@ export const useWordsStore = defineStore('words', () => {
       }
       while (true) {
         const selected = items[Math.floor(Math.random() * items.length)];
-        if (ignoreIds && !ignoreIds.includes(selected.id)) {
+        if (ignoreIds === null || ignoreIds === undefined) {
+          return selected;
+        } else if (!ignoreIds.includes(selected.id)) {
           return selected;
         }
       }
@@ -125,7 +127,7 @@ export const useWordsStore = defineStore('words', () => {
 
   const randomWords = (
     expected: number,
-    ignoreIds: string[] | null | undefined
+    ignoreIds: string[] | null | undefined,
   ): Word[] => {
     let items = [...words.value];
     if (ignoreIds) {
@@ -143,7 +145,7 @@ export const useWordsStore = defineStore('words', () => {
   const createWord = async (
     word1: string[],
     word2: string[],
-    isLearnedFlg: boolean
+    isLearnedFlg: boolean,
   ): Promise<void> => {
     await addDoc(wordsCol, {
       userId: user?.uid || '',
@@ -160,7 +162,7 @@ export const useWordsStore = defineStore('words', () => {
     id: string,
     word1: string[],
     word2: string[],
-    isLearnedFlg: boolean
+    isLearnedFlg: boolean,
   ): Promise<void> => {
     await updateDoc(doc(wordsCol, id), {
       word1: word1,

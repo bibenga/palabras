@@ -11,71 +11,41 @@
 
       <q-separator />
 
-      <q-card-section>
-        <div v-for="(item, index) in rows" :key="index" class="row">
+      <q-card-section v-if="rows != null">
+        <div v-for="item in rows" :key="item.id" class="row">
           <div class="col-6 q-pa-xs">
             <q-btn
-              :class="{ shake: incorrect && item.word1Id == word1Selected }"
+              :class="{ shake: incorrect && item.left.wordId == leftSelected }"
               style="width: 100%; font-size: 1.2em"
-              :outline="getOutline(item.word1Id, word1Selected)"
-              :disable="getDisabled(item.word1Id, word1Selected)"
-              :color="getColor(item.word1Id, word1Selected)"
-              :label="item.word1"
-              @click="() => word1Clicked(item)"
+              :outline="getOutline(item.left.wordId, leftSelected)"
+              :disable="getDisabled(item.left.wordId, leftSelected)"
+              :color="getColor(item.left.wordId, leftSelected)"
+              :label="item.left.word1[0]"
+              @click="() => leftClicked(item.left)"
             />
           </div>
           <div class="col-6 q-pa-xs">
             <q-btn
               style="width: 100%; font-size: 1.2em"
-              :class="{ shake: incorrect && item.word2Id == word2Selected }"
-              :outline="getOutline(item.word2Id, word2Selected)"
-              :disable="getDisabled(item.word2Id, word2Selected)"
-              :color="getColor(item.word2Id, word2Selected)"
-              :label="item.word2"
-              @click="() => word2Clicked(item)"
+              :class="{
+                shake: incorrect && item.right.wordId == rightSelected,
+              }"
+              :outline="getOutline(item.right.wordId, rightSelected)"
+              :disable="getDisabled(item.right.wordId, rightSelected)"
+              :color="getColor(item.right.wordId, rightSelected)"
+              :label="item.right.word2[0]"
+              @click="() => rightClicked(item.right)"
             />
           </div>
         </div>
       </q-card-section>
-
-      <!-- <q-card-section class="q-pa-none">
-        <q-card-section horizontal class="q-pa-none row">
-          <q-card-section class="q-pa-none col-6">
-            <div v-for="card in cards" :key="card.id" class="q-pa-xs">
-              <q-btn
-                style="width: 100%; font-size: 1.2em"
-                :outline="getOutline(card.word1Id, word1Selected)"
-                :disable="getDisabled(card.word1Id, word1Selected)"
-                :color="getColor(card.word1Id, word1Selected)"
-                :label="card.word1"
-                @click="() => word1Clicked(card)"
-              />
-            </div>
-          </q-card-section>
-
-          <q-separator vertical />
-
-          <q-card-section class="q-pa-none col-6">
-            <div v-for="card in cards" :key="card.id" class="q-pa-xs">
-              <q-btn
-                style="width: 100%; font-size: 1.2em"
-                :outline="getOutline(card.word2Id, word2Selected)"
-                :disable="getDisabled(card.word2Id, word2Selected)"
-                :color="getColor(card.word2Id, word2Selected)"
-                :label="card.word2"
-                @click="() => word2Clicked(card)"
-              />
-            </div>
-          </q-card-section>
-        </q-card-section>
-      </q-card-section> -->
 
       <q-separator />
 
       <q-card-actions>
         <q-btn
           v-if="rows.length == correct.length"
-          @click="() => init()"
+          @click="() => newTask()"
           label="Siguiente"
           unelevated
           class="btn"
@@ -83,7 +53,7 @@
         />
         <q-btn
           v-else
-          @click="() => init()"
+          @click="() => newTask()"
           label="Siguiente"
           unelevated
           class="btn"
@@ -139,74 +109,87 @@
 </style>
 
 <script setup lang="ts">
-import { useWordsStore } from 'src/stores/words';
 import { storeToRefs } from 'pinia';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onUnmounted, ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
+import { useTasksStore } from 'src/stores/tasks';
+import { TaskWord } from 'src/stores/models';
 
 const $q = useQuasar();
 
-const wordsStore = useWordsStore();
-const { ready } = storeToRefs(wordsStore);
-
-const rows = ref<object[]>([]);
-const correct = ref<string[]>([]);
-const incorrect = ref(false);
-const word1Selected = ref('');
-const word2Selected = ref('');
-
-onMounted(() => {
-  if (wordsStore.words.length > 0) {
-    init();
-  } else {
-    const unwatch = watch(
-      () => wordsStore.words.length,
-      (w) => {
-        console.log('watch', w);
-        unwatch();
-        init();
-      }
-    );
+const tasksStore = useTasksStore();
+const { tasks, ready } = storeToRefs(tasksStore);
+const task = computed(() => {
+  if (tasks.value === null || tasks.value === undefined) {
+    return null;
   }
+  for (const t of tasks.value) {
+    if (t.type === 'choice') {
+      if (!t.isDoneFlg && !t.isSkipedFlg) {
+        return t;
+      } else {
+        return null;
+      }
+    }
+  }
+  return null;
 });
 
-const init = () => {
-  const randomWords = wordsStore.randomWords(5, null);
-  const res = [];
-  for (let i = 0; i < randomWords.length; i++) {
-    res.push({
-      id: i,
-      word1Id: '',
-      word1: '',
-      word2Id: '',
-      word2: '',
-    });
-  }
-  for (const w of randomWords) {
-    let word1 = w.word1[0];
-    let word2 = w.word2[0];
-    while (true) {
-      const index = Math.floor(Math.random() * res.length);
-      if (res[index].word1 == '') {
-        res[index].word1Id = w.id;
-        res[index].word1 = word1;
-        break;
-      }
-    }
-    while (true) {
-      const index = Math.floor(Math.random() * res.length);
-      if (res[index].word2 == '') {
-        res[index].word2Id = w.id;
-        res[index].word2 = word2;
-        break;
-      }
+interface ButtonRow {
+  id: string;
+  left: TaskWord;
+  right: TaskWord;
+}
+
+const rows = computed(() => {
+  const words = task.value?.words;
+  const res: ButtonRow[] = [];
+  if (words) {
+    const left = [...words].sort(
+      (i1, i2) => i1.word1position - i2.word1position,
+    );
+    const right = [...words].sort(
+      (i1, i2) => i1.word2position - i2.word2position,
+    );
+    for (let i = 0; i < words.length; i++) {
+      const l = left[i];
+      const r = right[i];
+      // console.log('left', i, `${l.word2position} - ${l.word2[0]}`);
+      // console.log('right', i, `${r.word2position} - ${r.word2[0]}`);
+      res.push({
+        id: `${l.wordId}-${r.wordId}`,
+        left: l,
+        right: r,
+      });
     }
   }
-  rows.value = res;
-  correct.value = [];
-  incorrect.value = false;
-  word1Selected.value = '';
-  word2Selected.value = '';
+  return res;
+});
+
+const correct = ref<string[]>([]);
+const incorrect = ref(false);
+const leftSelected = ref('');
+const rightSelected = ref('');
+
+const newTask = async () => {
+  $q.loading.show();
+  try {
+    const success = await tasksStore.newTask('choice');
+    console.debug('newTask', success);
+    if (!success) {
+      $q.notify({
+        type: 'negative',
+        message: "Can't create new task",
+        timeout: 2000,
+      });
+    }
+    correct.value = [];
+    incorrect.value = false;
+    leftSelected.value = '';
+    rightSelected.value = '';
+  } finally {
+    $q.loading.hide();
+  }
 };
 
 const getDisabled = (wordId: string, selectedWordId: string): boolean => {
@@ -237,22 +220,25 @@ const getOutline = (wordId: string, selectedWordId: string): boolean => {
 };
 
 let errorTimer = null;
-const validate = (): void => {
-  if (word1Selected.value === '' || word2Selected.value === '') {
+const validate = async (): Promise<void> => {
+  if (leftSelected.value === '' || rightSelected.value === '') {
     return;
   }
-  if (word1Selected.value === word2Selected.value) {
-    correct.value = [word1Selected.value, ...correct.value];
-    word1Selected.value = '';
-    word2Selected.value = '';
+  if (leftSelected.value === rightSelected.value) {
+    correct.value = [leftSelected.value, ...correct.value];
+    leftSelected.value = '';
+    rightSelected.value = '';
   } else {
     incorrect.value = true;
     errorTimer = setTimeout(() => {
-      word1Selected.value = '';
-      word2Selected.value = '';
+      leftSelected.value = '';
+      rightSelected.value = '';
       incorrect.value = false;
       errorTimer = null;
     }, 900);
+  }
+  if (task.value?.words.length === correct.value.length) {
+    await tasksStore.markAsDone(task.value);
   }
 };
 onUnmounted(() => {
@@ -262,21 +248,21 @@ onUnmounted(() => {
   }
 });
 
-const word1Clicked = (item): void => {
-  if (word1Selected.value == item.word1Id) {
-    word1Selected.value = '';
+const leftClicked = async (left: TaskWord): Promise<void> => {
+  if (leftSelected.value == left.wordId) {
+    leftSelected.value = '';
   } else {
-    word1Selected.value = item.word1Id;
+    leftSelected.value = left.wordId;
   }
-  validate();
+  await validate();
 };
 
-const word2Clicked = (item): void => {
-  if (word2Selected.value == item.word2Id) {
-    word2Selected.value = '';
+const rightClicked = async (right: TaskWord): Promise<void> => {
+  if (rightSelected.value == right.wordId) {
+    rightSelected.value = '';
   } else {
-    word2Selected.value = item.word2Id;
+    rightSelected.value = right.wordId;
   }
-  validate();
+  await validate();
 };
 </script>
