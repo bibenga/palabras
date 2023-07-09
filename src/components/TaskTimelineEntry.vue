@@ -6,12 +6,12 @@
     :icon="iconName"
   >
     <template v-slot:title>
+      <span> {{ type }}: </span>
       <template v-for="word in task.words" :key="word.wordId">
-        <span> {{ type }}: </span>
         <span
           style="text-decoration-line: underline; text-decoration-style: dotted"
         >
-          {{ word.word1.join(', ') }}
+          {{ word.word1.join(', ') }},
           <q-tooltip :hide-delay="$q.screen.xs ? 5000 : 0">
             {{ word.word2.join(', ') }}
           </q-tooltip>
