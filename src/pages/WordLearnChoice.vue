@@ -44,7 +44,7 @@
 
       <q-card-actions>
         <q-btn
-          v-if="rows.length == correct.length"
+          v-if="task?.isDoneFlg || rows.length == correct.length"
           @click="() => newTask()"
           label="Siguiente"
           unelevated
@@ -125,7 +125,7 @@ const task = computed(() => {
   }
   for (const t of tasks.value) {
     if (t.type === 'choice') {
-      if (!t.isDoneFlg && !t.isSkipedFlg) {
+      if (!t.isSkipedFlg) {
         return t;
       } else {
         return null;
@@ -193,7 +193,7 @@ const newTask = async () => {
 };
 
 const getDisabled = (wordId: string, selectedWordId: string): boolean => {
-  if (correct.value.includes(wordId)) {
+  if (task.value?.isDoneFlg || correct.value.includes(wordId)) {
     return true;
   }
   if (selectedWordId != '' && wordId != selectedWordId) {
@@ -203,7 +203,7 @@ const getDisabled = (wordId: string, selectedWordId: string): boolean => {
 };
 
 const getColor = (wordId: string, selectedWordId: string): string => {
-  if (correct.value.includes(wordId)) {
+  if (task.value?.isDoneFlg || correct.value.includes(wordId)) {
     return 'positive';
   }
   if (incorrect.value && wordId === selectedWordId) {
@@ -213,7 +213,7 @@ const getColor = (wordId: string, selectedWordId: string): string => {
 };
 
 const getOutline = (wordId: string, selectedWordId: string): boolean => {
-  if (correct.value.includes(wordId)) {
+  if (task.value?.isDoneFlg || correct.value.includes(wordId)) {
     return true;
   }
   return wordId != selectedWordId;
