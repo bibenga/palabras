@@ -138,6 +138,10 @@ const answer = ref('');
 const answerIsValid = ref<boolean>();
 
 const newTask = async () => {
+  if (task.value && !task.value.isDoneFlg && !task.value.isSkipedFlg) {
+    await tasksStore.markAsSkiped(task.value);
+  }
+
   const success = await tasksStore.newTask('translation');
   console.debug('newTask', success);
   if (!success) {

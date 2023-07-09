@@ -174,6 +174,10 @@ const rightSelected = ref('');
 const newTask = async () => {
   $q.loading.show();
   try {
+    if (task.value && !task.value.isDoneFlg && !task.value.isSkipedFlg) {
+      await tasksStore.markAsSkiped(task.value);
+    }
+
     const success = await tasksStore.newTask('choice');
     console.debug('newTask', success);
     if (!success) {
