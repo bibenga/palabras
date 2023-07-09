@@ -7,6 +7,7 @@
   >
     <template v-slot:title>
       <template v-for="word in task.words" :key="word.wordId">
+        <span> {{ type }}: </span>
         <span
           style="text-decoration-line: underline; text-decoration-style: dotted"
         >
@@ -30,6 +31,18 @@ interface Props {
   timeFormat: 'timeAgo' | 'time' | 'full';
 }
 const props = defineProps<Props>();
+
+const type = computed(() => {
+  const task = props.task;
+  if (task.type == 'translation') {
+    return 'Translation';
+  } else if (task.type == 'choice') {
+    return 'Choice';
+  }
+  {
+    return 'Unknown';
+  }
+});
 
 const iconName = computed(() => {
   const task = props.task;
