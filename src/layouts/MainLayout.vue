@@ -23,11 +23,17 @@
             <q-route-tab name="progress" icon="dashboard" to="/progress">
               <q-tooltip class="bg-accent">Progress</q-tooltip>
             </q-route-tab>
-            <q-route-tab name="learn" icon="school" to="/learn">
-              <q-tooltip class="bg-accent">Learn words</q-tooltip>
+            <q-route-tab
+              name="learn-translation"
+              icon="school"
+              to="/learn/translation"
+            >
+              <q-tooltip class="bg-accent"
+                >Learn words as translation</q-tooltip
+              >
             </q-route-tab>
-            <q-route-tab name="learn2" icon="list_alt" to="/learn2">
-              <q-tooltip class="bg-accent">Learn words 2</q-tooltip>
+            <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
+              <q-tooltip class="bg-accent">Learn words as choice</q-tooltip>
             </q-route-tab>
             <q-route-tab name="word" icon="view_list" to="/word">
               <q-tooltip class="bg-accent">Add or remove words</q-tooltip>
@@ -76,11 +82,15 @@
           <q-route-tab name="progress" icon="dashboard" to="/progress">
             <q-tooltip class="bg-accent">Progress</q-tooltip>
           </q-route-tab>
-          <q-route-tab name="learn" icon="school" to="/learn">
-            <q-tooltip class="bg-accent">Learn words</q-tooltip>
+          <q-route-tab
+            name="learn-translation"
+            icon="school"
+            to="/learn/translation"
+          >
+            <q-tooltip class="bg-accent">Learn words as translation</q-tooltip>
           </q-route-tab>
-          <q-route-tab name="learn2" icon="list_alt" to="/learn2">
-            <q-tooltip class="bg-accent">Learn words 2</q-tooltip>
+          <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
+            <q-tooltip class="bg-accent">Learn words as choice</q-tooltip>
           </q-route-tab>
           <q-route-tab name="word" icon="view_list" to="/word">
             <q-tooltip class="bg-accent">Add or remove words</q-tooltip>
@@ -128,7 +138,7 @@ function logout() {
 }
 
 const isAcceptedCookieConsent = ref(
-  $q.localStorage.getItem('AcceptedCookieConsent') === true
+  $q.localStorage.getItem('AcceptedCookieConsent') === true,
 );
 const setCookieConsent = () => {
   $q.localStorage.set('AcceptedCookieConsent', true);
