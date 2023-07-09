@@ -123,7 +123,7 @@ const task = computed(() => {
   for (const t of tasks.value) {
     console.log(t.id, t.type);
     if (t.type === 'translation') {
-      if (!t.isDoneFlg && !t.isSkipedFlg) {
+      if (!t.isSkipedFlg) {
         return t;
       } else {
         return null;
