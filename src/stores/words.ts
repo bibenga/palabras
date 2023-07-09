@@ -59,7 +59,7 @@ export const useWordsStore = defineStore('words', () => {
     const wordsQuery = query(
       wordsCol,
       where('userId', '==', user.uid),
-      orderBy('word1', 'asc')
+      orderBy('word1', 'asc'),
     );
     wordsUnsubscribe = onSnapshot(wordsQuery, (snapshot) => {
       const res = [];
@@ -106,7 +106,7 @@ export const useWordsStore = defineStore('words', () => {
   };
 
   const randomWord = async (
-    wordId: string | null | undefined
+    ignoreIds: string[] | null | undefined,
   ): Promise<Word | null> => {
     const items = words.value;
     if (items != null && items.length > 0) {
@@ -115,7 +115,9 @@ export const useWordsStore = defineStore('words', () => {
       }
       while (true) {
         const selected = items[Math.floor(Math.random() * items.length)];
-        if (selected.id != wordId) {
+        if (ignoreIds === null || ignoreIds === undefined) {
+          return selected;
+        } else if (!ignoreIds.includes(selected.id)) {
           return selected;
         }
       }
@@ -123,10 +125,27 @@ export const useWordsStore = defineStore('words', () => {
     return null;
   };
 
+  const randomWords = (
+    expected: number,
+    ignoreIds: string[] | null | undefined,
+  ): Word[] => {
+    let items = [...words.value];
+    if (ignoreIds) {
+      items = items.filter((item) => !ignoreIds.includes(item.id));
+    }
+    const res = [] as Word[];
+    while (res.length < expected && items.length > 0) {
+      const index = Math.floor(Math.random() * items.length);
+      res.push(items[index]);
+      items.splice(index, 1);
+    }
+    return res;
+  };
+
   const createWord = async (
     word1: string[],
     word2: string[],
-    isLearnedFlg: boolean
+    isLearnedFlg: boolean,
   ): Promise<void> => {
     await addDoc(wordsCol, {
       userId: user?.uid || '',
@@ -143,7 +162,7 @@ export const useWordsStore = defineStore('words', () => {
     id: string,
     word1: string[],
     word2: string[],
-    isLearnedFlg: boolean
+    isLearnedFlg: boolean,
   ): Promise<void> => {
     await updateDoc(doc(wordsCol, id), {
       word1: word1,
@@ -211,6 +230,7 @@ export const useWordsStore = defineStore('words', () => {
     words,
     getWord,
     randomWord,
+    randomWords,
     createWord,
     updateWord,
     markWordAsLearned,

@@ -17,9 +17,8 @@ import {
 } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { useWordsStore } from './words';
-import deburr from 'lodash/deburr';
-import isEqual from 'lodash/isEqual';
-import { Task, TaskProgress } from './models';
+import shuffle from 'lodash/shuffle';
+import { Task, TaskWord, TaskType, TaskProgress } from './models';
 
 export const useTasksStore = defineStore('tasks', () => {
   console.log('[tasks.setup]');
@@ -28,11 +27,11 @@ export const useTasksStore = defineStore('tasks', () => {
   const firestore = inject<Firestore>('firestore');
   const tasksCol = collection(firestore, 'tasks');
 
-  const wordStore = useWordsStore();
+  const wordsStore = useWordsStore();
 
   const ready = ref(false);
-  const task = ref<Task | null>(null);
-  const tasks = ref<TaskProgress | null>(null);
+  const tasks = ref<Task[]>([]);
+  const statistics = ref<TaskProgress | null>(null);
 
   let user: User | null = null;
 
@@ -49,13 +48,15 @@ export const useTasksStore = defineStore('tasks', () => {
     return {
       id: d.id,
       userId: d.data().userId,
-      wordId: d.data().wordId,
-      word1: d.data().word1,
-      word2: d.data().word2,
-      isDoneFlg: d.data().isDoneFlg,
-      isSkipedFlg: d.data().isSkipedFlg,
       createdTs: d.data().createdTs.toDate(),
       updatedTs: d.data().updatedTs?.toDate() || d.data().createdTs.toDate(),
+
+      isDoneFlg: d.data().isDoneFlg,
+      isSkipedFlg: d.data().isSkipedFlg,
+      errorCount: d.data().errorCount,
+
+      type: d.data().type,
+      words: d.data().words,
     };
   };
 
@@ -63,32 +64,27 @@ export const useTasksStore = defineStore('tasks', () => {
   const init = () => {
     console.debug('[tasks.init]', user?.uid);
     if (user == null) {
-      task.value = null;
-      tasks.value = null;
+      tasks.value = [];
+      statistics.value = null;
       return;
     }
     const tasksQuery = query(
       tasksCol,
       where('userId', '==', user.uid),
       orderBy('createdTs', 'desc'),
-      limit(100)
+      limit(100),
     );
     tasksUnsubscribe = onSnapshot(tasksQuery, (snapshot) => {
       console.debug('[tasks.onSnapshot]', snapshot);
       if (!snapshot.empty) {
-        const t = deserialize(snapshot.docs[0]);
-        if (!t.isDoneFlg && !t.isSkipedFlg) {
-          task.value = t;
-        } else {
-          task.value = null;
-        }
-
         const now = toDate(new Date());
+        const alltasks = [];
         const today = [];
         const yeasterday = [];
         const previously = [];
         for (const taskDoc of snapshot.docs) {
           const t = deserialize(taskDoc);
+          alltasks.push(t);
           const tDate = toDate(t.createdTs);
           if (now.getTime() - tDate.getTime() == 0) {
             today.push(t);
@@ -98,12 +94,13 @@ export const useTasksStore = defineStore('tasks', () => {
             previously.push(t);
           }
         }
-        tasks.value = { today, yeasterday, previously };
-        console.debug('tasks', tasks.value);
+        tasks.value = alltasks;
+        statistics.value = { today, yeasterday, previously };
       } else {
-        tasks.value = null;
-        task.value = null;
+        tasks.value = [];
+        statistics.value = null;
       }
+      console.debug('statistics', statistics.value);
       ready.value = true;
     });
   };
@@ -113,8 +110,8 @@ export const useTasksStore = defineStore('tasks', () => {
     if (tasksUnsubscribe != null) {
       tasksUnsubscribe();
       tasksUnsubscribe = null;
-      tasks.value = null;
-      task.value = null;
+      tasks.value = [];
+      statistics.value = null;
     }
   };
 
@@ -122,59 +119,93 @@ export const useTasksStore = defineStore('tasks', () => {
     user = authUser;
     console.debug('[tasks.onAuthStateChanged]', authUser?.uid);
     if (user) {
+      cleanup();
       init();
     } else {
       cleanup();
     }
   });
 
-  const newTask = async (): Promise<boolean> => {
-    const t = task.value;
-    const wordId = t?.wordId;
-
-    if (t != null) {
-      if (!t.isSkipedFlg && !t.isDoneFlg) {
-        await updateDoc(doc(tasksCol, t.id), {
-          isSkipedFlg: true,
+  const newTask = async (type: TaskType): Promise<boolean> => {
+    if (type === 'translation') {
+      const randomWord = await wordsStore.randomWord(null);
+      if (randomWord != null) {
+        const queryAndAnswer = [randomWord.word1, randomWord.word2];
+        shuffle(queryAndAnswer);
+        const word: TaskWord = {
+          wordId: randomWord.id,
+          word1: queryAndAnswer[0],
+          word2: queryAndAnswer[1],
+        };
+        const task = {
+          userId: user?.uid,
+          createdTs: new Date(),
           updatedTs: new Date(),
+
+          isDoneFlg: false,
+          isSkipedFlg: false,
+          errorCount: 0,
+
+          // el tipo de el ejercicio: translation; choice
+          type: type,
+
+          // word?: TaskWordPair;
+          words: [word],
+        };
+        console.debug('new task', type, task);
+        await addDoc(tasksCol, task);
+      }
+      return randomWord != null;
+    } else if (type == 'choice') {
+      const randomWords = wordsStore.randomWords(5, null);
+      if (randomWords.length > 0) {
+        const words = [] as TaskWord[];
+
+        const pos = [] as number[];
+        for (let i = 0; i < randomWords.length; i++) {
+          pos.push(i);
+        }
+        const pos1 = shuffle(pos);
+        const pos2 = shuffle(pos);
+
+        randomWords.forEach((w, i) => {
+          words.push({
+            wordId: w.id,
+            word1: w.word1,
+            word1position: pos1[i],
+            word2: w.word2,
+            word2position: pos2[i],
+          } as TaskWord);
         });
-      }
-    }
 
-    const word = await wordStore.randomWord(wordId);
-    if (word != null) {
-      let word1, word2;
-      if (Math.random() >= 0.5) {
-        word1 = word.word1;
-        word2 = word.word2;
-      } else {
-        word1 = word.word2;
-        word2 = word.word1;
-      }
-      await addDoc(tasksCol, {
-        userId: user?.uid,
-        wordId: word.id,
-        word1: word1,
-        word2: word2,
-        isDoneFlg: false,
-        isSkipedFlg: false,
-        createdTs: new Date(),
-        updatedTs: new Date(),
-      });
-    }
+        const task = {
+          userId: user?.uid,
+          createdTs: new Date(),
+          updatedTs: new Date(),
 
-    return word != null;
+          isDoneFlg: false,
+          isSkipedFlg: false,
+          errorCount: 0,
+
+          // el tipo de el ejercicio: translation; choice
+          type: type,
+
+          // word?: TaskWordPair;
+          words: words,
+        };
+        console.debug('new task', type, task);
+        await addDoc(tasksCol, task);
+      }
+      return randomWords.length > 0;
+    } else {
+      throw new Error(`The type '${type}' is unknown`);
+    }
   };
 
-  const markAsLearned = async () => {
-    const t = task.value;
-    if (t == null) {
-      return;
-    }
-
-    if (!t.isSkipedFlg && !t.isDoneFlg) {
+  const markAsLearned = async (task: Task) => {
+    if (task.type === 'translation' && !task.isSkipedFlg && !task.isDoneFlg) {
       try {
-        await updateDoc(doc(tasksCol, t.id), {
+        await updateDoc(doc(tasksCol, task.id), {
           isSkipedFlg: true,
           updatedTs: new Date(),
         });
@@ -182,49 +213,38 @@ export const useTasksStore = defineStore('tasks', () => {
         console.error(error);
       }
       try {
-        await wordStore.markWordAsLearned(t.wordId);
+        await wordsStore.markWordAsLearned(t.words[0].wordId);
       } catch (error) {
         console.error(error);
       }
     }
   };
 
-  const splitRule = /[ \r\n¡!¿?.,:;'\"]+/;
-  // const convert = (s: string) => s.toLowerCase().normalize('NFKD').split(splitRule);
-  const convert = (s: string): string[] =>
-    deburr(s.toLowerCase()).split(splitRule);
-  const validateAnswer = async (answer: string): Promise<boolean> => {
-    const t = task.value;
-    if (t == null) {
-      return false;
-    }
-
-    const aAnswer = convert(answer);
-    let valid = false;
-    for (const word2 of t.word2) {
-      const aWord2 = convert(word2);
-      valid = isEqual(aAnswer, aWord2);
-      console.debug(aAnswer, '===', aWord2, '->', valid);
-      if (valid) {
-        break;
-      }
-    }
-
-    if (valid) {
-      await updateDoc(doc(tasksCol, t.id), {
+  const markAsDone = async (task: Task): Promise<void> => {
+    if (!task.isDoneFlg && !task.isSkipedFlg) {
+      await updateDoc(doc(tasksCol, task.id), {
         isDoneFlg: true,
         updatedTs: new Date(),
       });
     }
-    return valid;
+  };
+
+  const markAsSkiped = async (task: Task): Promise<void> => {
+    if (!task.isDoneFlg && !task.isSkipedFlg) {
+      await updateDoc(doc(tasksCol, task.id), {
+        isSkipedFlg: true,
+        updatedTs: new Date(),
+      });
+    }
   };
 
   return {
     ready,
-    task,
     tasks,
+    statistics,
     newTask,
+    markAsDone,
+    markAsSkiped,
     markAsLearned,
-    validateAnswer,
   };
 });

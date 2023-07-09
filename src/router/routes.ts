@@ -23,8 +23,13 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
-        path: 'learn',
-        component: () => import('pages/WordLearnPage.vue'),
+        path: 'learn/translation',
+        component: () => import('pages/WordLearnTranslationPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'learn/choice',
+        component: () => import('pages/WordLearnChoice.vue'),
         meta: { requiresAuth: true },
       },
       {

@@ -11,8 +11,8 @@
 
       <q-separator />
 
-      <q-card-section>
-        <p v-if="task != null" style="min-height: 3em">
+      <q-card-section v-if="task != null">
+        <p style="min-height: 3em">
           <span>
             <span
               style="
@@ -22,10 +22,10 @@
                 text-decoration-style: dotted;
               "
             >
-              {{ task.word1[0] }}
+              {{ task.words[0].word1[0] }}
             </span>
             <q-tooltip :hide-delay="5000">
-              {{ task.word2.join(', ') }}
+              {{ task.words[0].word2.join(', ') }}
             </q-tooltip>
           </span>
         </p>
@@ -88,7 +88,7 @@
   </q-page>
 </template>
 
-<style>
+<style scoped>
 .screen--xs .learn-form {
   width: 100%;
 }
@@ -106,21 +106,39 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useTasksStore } from 'src/stores/tasks';
 import { storeToRefs } from 'pinia';
+import deburr from 'lodash/deburr';
+import isEqual from 'lodash/isEqual';
 
 const $q = useQuasar();
 
 const tasksStore = useTasksStore();
-const { task, ready } = storeToRefs(tasksStore);
+const { tasks, ready } = storeToRefs(tasksStore);
+const task = computed(() => {
+  if (tasks.value === null || tasks.value === undefined) {
+    return null;
+  }
+  for (const t of tasks.value) {
+    console.log(t.id, t.type);
+    if (t.type === 'translation') {
+      if (!t.isDoneFlg && !t.isSkipedFlg) {
+        return t;
+      } else {
+        return null;
+      }
+    }
+  }
+  return null;
+});
 
 const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
 
 const newTask = async () => {
-  const success = await tasksStore.newTask();
+  const success = await tasksStore.newTask('translation');
   console.debug('newTask', success);
   if (!success) {
     $q.notify({
@@ -152,7 +170,7 @@ const markAsLearned = async () => {
   }).onOk(async () => {
     $q.loading.show();
     try {
-      await tasksStore.markAsLearned();
+      await tasksStore.markAsLearned(task.value);
       await newTask();
     } finally {
       $q.loading.hide();
@@ -160,13 +178,44 @@ const markAsLearned = async () => {
   });
 };
 
+const splitRule = /[ \r\n¡!¿?.,:;'\"]+/;
+// const convert = (s: string) => s.toLowerCase().normalize('NFKD').split(splitRule);
+const convert = (s: string): string[] =>
+  deburr(s.toLowerCase()).split(splitRule);
+
 const validateAnswer = async () => {
-  const valid = await tasksStore.validateAnswer(answer.value);
+  const t = task.value;
+  if (t === null || t === undefined) {
+    return;
+  }
+
+  const aAnswer = convert(answer.value);
+  let valid = false;
+  const word = t.words[0];
+  for (const word2 of word.word2) {
+    const aWord2 = convert(word2);
+    valid = isEqual(aAnswer, aWord2);
+    console.debug(aAnswer, '===', aWord2, '->', valid);
+    if (valid) {
+      break;
+    }
+  }
+
   answerIsValid.value = valid;
-  if (!valid) {
+  if (valid) {
+    await tasksStore.markAsDone(t);
+  } else {
     answerInput.value.focus();
   }
 };
+
+// const validateAnswer = async () => {
+//   const valid = await tasksStore.validateAnswer(answer.value);
+//   answerIsValid.value = valid;
+//   if (!valid) {
+//     answerInput.value.focus();
+//   }
+// };
 
 const nextTask = async () => {
   $q.loading.show();

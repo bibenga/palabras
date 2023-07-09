@@ -72,7 +72,7 @@
   </q-page>
 </template>
 
-<style>
+<style scoped>
 .screen--xs .login-form {
   width: 100%;
 }
