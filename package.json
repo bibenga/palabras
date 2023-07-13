@@ -10,7 +10,9 @@
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "dev-pwa": "quasar dev -m pwa",
+    "build": "quasar build",
+    "build-pwa": "quasar build -m pwa"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.5",
@@ -37,7 +39,14 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-vue": "^9.15.1",
     "prettier": "^3.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "workbox-build": "^6.6.0",
+    "workbox-cacheable-response": "^6.6.0",
+    "workbox-core": "^6.6.0",
+    "workbox-expiration": "^6.6.0",
+    "workbox-precaching": "^6.6.0",
+    "workbox-routing": "^6.6.0",
+    "workbox-strategies": "^6.6.0"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",
