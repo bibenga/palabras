@@ -15,38 +15,38 @@
           :icon="$q.dark.isActive ? 'dark_mode' : 'light_mode'"
           @click="$q.dark.toggle"
         >
-          <q-tooltip class="bg-accent">Dark or ligt mode</q-tooltip>
+          <q-tooltip class="bg-primary">Dark or ligt mode</q-tooltip>
         </q-btn>
 
         <template v-if="user">
           <q-tabs v-if="!$q.screen.xs" class="bg-primary text-white">
             <q-route-tab name="progress" icon="dashboard" to="/progress">
-              <q-tooltip class="bg-accent">Progress</q-tooltip>
+              <q-tooltip class="bg-primary">Progress</q-tooltip>
             </q-route-tab>
             <q-route-tab
               name="learn-translation"
               icon="school"
               to="/learn/translation"
             >
-              <q-tooltip class="bg-accent"
+              <q-tooltip class="bg-primary"
                 >Learn words as translation</q-tooltip
               >
             </q-route-tab>
             <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
-              <q-tooltip class="bg-accent">Learn words as choice</q-tooltip>
+              <q-tooltip class="bg-primary">Learn words as choice</q-tooltip>
             </q-route-tab>
             <q-route-tab name="word" icon="view_list" to="/word">
-              <q-tooltip class="bg-accent">Add or remove words</q-tooltip>
+              <q-tooltip class="bg-primary">Add or remove words</q-tooltip>
             </q-route-tab>
           </q-tabs>
 
           <q-btn stretch flat icon="logout" @click="logout">
-            <q-tooltip class="bg-accent">Logout</q-tooltip>
+            <q-tooltip class="bg-primary">Logout</q-tooltip>
           </q-btn>
         </template>
         <template v-else>
           <q-btn stretch flat icon="login" to="/login">
-            <q-tooltip class="bg-accent">Login</q-tooltip>
+            <q-tooltip class="bg-primary">Login</q-tooltip>
           </q-btn>
         </template>
       </q-toolbar>
@@ -80,20 +80,20 @@
       <q-toolbar v-if="user != null && $q.screen.xs">
         <q-tabs class="bg-primary text-white" switch-indicator align="justify">
           <q-route-tab name="progress" icon="dashboard" to="/progress">
-            <q-tooltip class="bg-accent">Progress</q-tooltip>
+            <q-tooltip class="bg-primary">Progress</q-tooltip>
           </q-route-tab>
           <q-route-tab
             name="learn-translation"
             icon="school"
             to="/learn/translation"
           >
-            <q-tooltip class="bg-accent">Learn words as translation</q-tooltip>
+            <q-tooltip class="bg-primary">Learn words as translation</q-tooltip>
           </q-route-tab>
           <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
-            <q-tooltip class="bg-accent">Learn words as choice</q-tooltip>
+            <q-tooltip class="bg-primary">Learn words as choice</q-tooltip>
           </q-route-tab>
           <q-route-tab name="word" icon="view_list" to="/word">
-            <q-tooltip class="bg-accent">Add or remove words</q-tooltip>
+            <q-tooltip class="bg-primary">Add or remove words</q-tooltip>
           </q-route-tab>
         </q-tabs>
       </q-toolbar>
