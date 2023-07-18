@@ -14,7 +14,7 @@
           {{
             word.word1.join(', ') + (index < task.words.length - 1 ? ';' : '')
           }}
-          <q-tooltip :hide-delay="$q.screen.xs ? 5000 : 0">
+          <q-tooltip class="bg-primary" :hide-delay="$q.screen.xs ? 5000 : 0">
             {{ word.word2.join(', ') }}
           </q-tooltip>
         </span>
