@@ -132,16 +132,20 @@ function logout() {
           message: `Goodby ${userName}!`,
           timeout: 1000,
         });
-        router.push({ path: '/' });
+        router.push({ path: '/login' });
       });
   });
 }
 
 const isAcceptedCookieConsent = ref(
-  $q.localStorage.getItem('AcceptedCookieConsent') === true,
+  // $q.localStorage.getItem('AcceptedCookieConsent') === true,
+  $q.cookies.get('PalabrasAcceptedCookieConsent') === '1',
 );
 const setCookieConsent = () => {
-  $q.localStorage.set('AcceptedCookieConsent', true);
+  // $q.localStorage.set('AcceptedCookieConsent', true);
+  $q.cookies.set('PalabrasAcceptedCookieConsent', '1', {
+    expires: 2,
+  });
   isAcceptedCookieConsent.value = true;
 };
 </script>
