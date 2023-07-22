@@ -1,15 +1,16 @@
 <template>
   <q-page v-if="ready">
     <q-table
-      ref="tableRef"
       title="Tus palabras para estudiar"
-      :grid="$q.screen.xs"
       :rows="wordsFiltered"
       :columns="columns"
+      class="words-tbl"
       row-key="id"
       selection="multiple"
       v-model:selected="selected"
+      virtual-scroll
       v-model:pagination="pagination"
+      :rows-per-page-options="[0]"
       :loading="!ready"
       binary-state-sort
       @row-click="(evt, row, index) => rowClicked(row)"
@@ -79,7 +80,7 @@
         </q-td>
       </template>
 
-      <template v-slot:item="props">
+      <!-- <template v-slot:item="props">
         <div
           class="q-pa-xs col-xs-12 col-sm-6 col-md-4"
           style="overflow: hidden"
@@ -110,13 +111,13 @@
             </q-card-section>
           </q-card>
         </div>
-      </template>
+      </template> -->
     </q-table>
 
     <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn
         @click="() => add()"
-        v-if="!loading && words.length < 100"
+        v-if="ready && words.length < 1000"
         fab
         icon="add"
         color="primary"
@@ -130,6 +131,61 @@
   width: 100%;
   margin-top: 8px;
   margin-left: 0px !important;
+}
+
+.screen--xs .words-tbl {
+  height: calc(100vh - 100px);
+}
+
+.words-tbl {
+  height: calc(100vh - 50px);
+}
+
+.words-tbl :deep(table) {
+  width: 100%;
+  /* table-layout: fixed; */
+}
+
+.words-tbl :deep(thead tr th) {
+  position: sticky;
+  z-index: 1;
+}
+
+.words-tbl :deep(thead tr:first-child th) {
+  background-color: #ffffff;
+  top: 0;
+}
+
+.body--dark .words-tbl :deep(thead tr:first-child th) {
+  background-color: var(--q-dark);
+}
+
+/* padding: top and bottom | left and right */
+.words-tbl :deep(td) {
+  padding: 7px 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* color: deeppink; */
+}
+
+.words-tbl :deep(th) {
+  padding: 7px 7px;
+}
+
+.words-tbl :deep(td:nth-child(2)) {
+  width: 50%;
+  /* background-color: pink; */
+}
+
+.words-tbl :deep(td:nth-child(3)) {
+  width: 50%;
+  /* background-color: blueviolet; */
+}
+
+.words-tbl :deep(td:nth-child(4)) {
+  width: 0%;
+  /* background-color: green; */
 }
 </style>
 
@@ -148,7 +204,7 @@ const router = useRouter();
 const wordsStore = useWordsStore();
 const { words, ready } = storeToRefs(wordsStore);
 
-const pagination = ref({});
+const pagination = ref({ rowsPerPage: 0 });
 const selected = ref([] as Word[]);
 
 const filter = ref('');
@@ -186,6 +242,7 @@ const columns = [
     align: 'left',
     field: (row) => row.word1,
     format: (val) => val?.join(', '),
+    // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'word2',
@@ -194,14 +251,16 @@ const columns = [
     align: 'left',
     field: (row) => row.word2,
     format: (val) => val?.join(', '),
+    // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'isLearnedFlg',
     required: true,
-    label: 'Is Learned',
+    label: 'Known',
     align: 'center',
     field: (row) => row.isLearnedFlg,
     format: (val) => (val ? 'yes' : 'no'),
+    // style: 'width: 0px',
   },
 ];
 
