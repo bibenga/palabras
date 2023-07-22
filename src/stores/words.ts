@@ -192,10 +192,9 @@ export const useWordsStore = defineStore('words', () => {
     await batch.commit();
   };
 
-  const loadDemoWords = async (): Promise<number> => {
+  const parseAndSaveWords = async (text: string): Promise<number> => {
     try {
-      const newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
-      const newWords = newWordsRaw
+      const newWords = text
         .toLowerCase()
         .split(/[\r\n]+/)
         .map((line) => line.trim())
@@ -203,6 +202,9 @@ export const useWordsStore = defineStore('words', () => {
         .map((line) => line.split(/\s*-\s*/))
         .filter((line) => line.length == 2)
         .map((line) => [line[0].split(/\s*,\s*/), line[1].split(/\s*,\s*/)]);
+
+      console.log('newWords', newWords);
+      return newWords.length;
 
       const batch = writeBatch(firestore);
       for (const pair of newWords) {
@@ -225,6 +227,50 @@ export const useWordsStore = defineStore('words', () => {
     }
   };
 
+  const loadEsRuDemoWords = async (): Promise<number> => {
+    try {
+      const newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
+      return await parseAndSaveWords(newWordsRaw);
+      // const newWords = newWordsRaw
+      //   .toLowerCase()
+      //   .split(/[\r\n]+/)
+      //   .map((line) => line.trim())
+      //   .filter((line) => line.length == 0 || !line.startsWith('#'))
+      //   .map((line) => line.split(/\s*-\s*/))
+      //   .filter((line) => line.length == 2)
+      //   .map((line) => [line[0].split(/\s*,\s*/), line[1].split(/\s*,\s*/)]);
+
+      // const batch = writeBatch(firestore);
+      // for (const pair of newWords) {
+      //   const wordDoc = doc(wordsCol);
+      //   batch.set(wordDoc, {
+      //     userId: user?.uid || '',
+      //     word1: pair[0],
+      //     word2: pair[1],
+      //     isLearnedFlg: false,
+      //     random: Math.random(),
+      //     createdTs: new Date(),
+      //     updatedTs: new Date(),
+      //   });
+      // }
+      // await batch.commit();
+      // return newWords.length;
+    } catch (error) {
+      console.error(error);
+      return -1;
+    }
+  };
+
+  const loadEsEnDemoWords = async (): Promise<number> => {
+    try {
+      const newWordsRaw = (await import('../assets/es-en.txt?raw')).default;
+      return await parseAndSaveWords(newWordsRaw);
+    } catch (error) {
+      console.error(error);
+      return -1;
+    }
+  };
+
   return {
     ready,
     words,
@@ -236,6 +282,7 @@ export const useWordsStore = defineStore('words', () => {
     markWordAsLearned,
     deleteWord,
     deleteWords,
-    loadDemoWords,
+    loadEsRuDemoWords,
+    loadEsEnDemoWords,
   };
 });

@@ -33,15 +33,26 @@
 
       <template v-slot:top>
         <q-btn
-          @click="() => loadDemoData()"
+          @click="() => loadEsRuDemoWords()"
           v-if="ready && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
           color="primary"
-          label="Add demo data"
+          label="Add ES/RU pairs"
           icon="add"
         />
+        <q-btn
+          @click="() => loadEsEnDemoWords()"
+          v-if="ready && words.length == 0"
+          unelevated
+          outline
+          class="q-ml-sm btn"
+          color="primary"
+          label="Add ES/EN pairs"
+          icon="add"
+        />
+
         <q-btn
           @click="() => add()"
           v-if="ready && words.length < 1000 && selected.length === 0"
@@ -264,12 +275,25 @@ const columns = [
   },
 ];
 
-const loadDemoData = async () => {
-  console.log('fakeAdd');
-
+const loadEsRuDemoWords = async () => {
+  console.log('loadEsRuDemoWords');
   $q.loading.show();
   try {
-    const loaded = await wordsStore.loadDemoWords();
+    const loaded = await wordsStore.loadEsRuDemoWords();
+    $q.notify({
+      message: `Was added ${loaded} word pair`,
+      timeout: 2000,
+    });
+  } finally {
+    $q.loading.hide();
+  }
+};
+
+const loadEsEnDemoWords = async () => {
+  console.log('loadEsEnDemoWords');
+  $q.loading.show();
+  try {
+    const loaded = await wordsStore.loadEsEnDemoWords();
     $q.notify({
       message: `Was added ${loaded} word pair`,
       timeout: 2000,
