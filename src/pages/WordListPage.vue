@@ -44,7 +44,7 @@
         />
         <q-btn
           @click="() => add()"
-          v-if="ready && words.length < 1000"
+          v-if="ready && words.length < 1000 && selected.length === 0"
           unelevated
           class="q-ml-sm btn"
           color="primary"
@@ -58,7 +58,7 @@
           class="q-ml-sm btn"
           icon="delete"
           color="negative"
-          label="Delete selected"
+          :label="`Delete ${selected.length} selected`"
         />
         <q-space v-if="!$q.screen.xs" />
         <q-input
