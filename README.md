@@ -1,7 +1,6 @@
 # Palabras (quasar-project)
-
-En hipoteticamente este proyecto no necesita firebase y la autenticación,
-pero fuieron muy interesante para mi
+Hipoteticamente, este proyecto no necesita firebase y la autenticación,
+pero estes es muy interesante para mi
 
 ## Deploy in firebase
 
