@@ -83,7 +83,7 @@ export const useWordsStore = defineStore('words', () => {
     }
   };
 
-  const authUnsunscribe = onAuthStateChanged(fireauth, (authUser) => {
+  onAuthStateChanged(fireauth, (authUser) => {
     user = authUser;
     console.debug('[words.onAuthStateChanged]', authUser?.uid);
     if (user) {

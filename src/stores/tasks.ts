@@ -115,7 +115,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   };
 
-  const authUnsunscribe = onAuthStateChanged(fireauth, (authUser) => {
+  onAuthStateChanged(fireauth, (authUser) => {
     user = authUser;
     console.debug('[tasks.onAuthStateChanged]', authUser?.uid);
     if (user) {
