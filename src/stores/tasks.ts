@@ -130,8 +130,7 @@ export const useTasksStore = defineStore('tasks', () => {
     if (type === 'translation') {
       const randomWord = await wordsStore.randomWord(null);
       if (randomWord != null) {
-        const queryAndAnswer = [randomWord.word1, randomWord.word2];
-        shuffle(queryAndAnswer);
+        const queryAndAnswer = shuffle([randomWord.word1, randomWord.word2]);
         const word: TaskWord = {
           wordId: randomWord.id,
           word1: queryAndAnswer[0],
