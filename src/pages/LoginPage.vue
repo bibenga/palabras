@@ -56,7 +56,7 @@
             type="submit"
             class="login-btn"
             color="primary"
-            icon="mail"
+            icon="login"
           />
 
           <q-btn

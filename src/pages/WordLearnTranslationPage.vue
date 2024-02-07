@@ -61,7 +61,7 @@
           v-else
           @click="() => nextTask()"
           label="Next"
-          icon="autorenew"
+          icon="navigate_next"
           unelevated
           class="btn"
           color="positive"

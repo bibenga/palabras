@@ -52,7 +52,7 @@
             type="submit"
             class="login-btn"
             color="primary"
-            icon="person"
+            icon="login"
           />
         </q-card-actions>
       </q-card>

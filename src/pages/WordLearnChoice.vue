@@ -47,7 +47,7 @@
           v-if="task?.isDoneFlg || rows.length == correct.length"
           @click="() => newTask()"
           label="Next"
-          icon="autorenew"
+          icon="navigate_next"
           unelevated
           class="btn"
           color="positive"
