@@ -832,7 +832,7 @@ emplear - use
 # Adverbs
 
 no - not
-    más - more
+más - more
 apenas - hardly
 también - also
 ya - already

@@ -244,6 +244,16 @@ export const useWordsStore = defineStore('words', () => {
     }
   };
 
+  const loadEnRuDemoWords = async (): Promise<number> => {
+    try {
+      const newWordsRaw = (await import('../assets/en-ru.txt?raw')).default;
+      return await parseAndSaveWords(newWordsRaw);
+    } catch (error) {
+      console.error(error);
+      return -1;
+    }
+  };
+
   return {
     ready,
     words,
@@ -257,5 +267,6 @@ export const useWordsStore = defineStore('words', () => {
     deleteWords,
     loadEsRuDemoWords,
     loadEsEnDemoWords,
+    loadEnRuDemoWords,
   };
 });

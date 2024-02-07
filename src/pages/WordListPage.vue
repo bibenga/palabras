@@ -39,7 +39,7 @@
           outline
           class="q-ml-sm btn"
           color="primary"
-          label="Add ES/RU pairs"
+          label="Add ES/RU demo pairs"
           icon="add"
         />
         <q-btn
@@ -49,7 +49,17 @@
           outline
           class="q-ml-sm btn"
           color="primary"
-          label="Add ES/EN pairs"
+          label="Add ES/EN demo pairs"
+          icon="add"
+        />
+        <q-btn
+          @click="() => loadEnRuDemoWords()"
+          v-if="ready && words.length == 0"
+          unelevated
+          outline
+          class="q-ml-sm btn"
+          color="primary"
+          label="Add EN/RU demo pairs"
           icon="add"
         />
 
@@ -294,6 +304,20 @@ const loadEsEnDemoWords = async () => {
   $q.loading.show();
   try {
     const loaded = await wordsStore.loadEsEnDemoWords();
+    $q.notify({
+      message: `Was added ${loaded} word pair`,
+      timeout: 2000,
+    });
+  } finally {
+    $q.loading.hide();
+  }
+};
+
+const loadEnRuDemoWords = async () => {
+  console.log('loadEnRuDemoWords');
+  $q.loading.show();
+  try {
+    const loaded = await wordsStore.loadEnRuDemoWords();
     $q.notify({
       message: `Was added ${loaded} word pair`,
       timeout: 2000,

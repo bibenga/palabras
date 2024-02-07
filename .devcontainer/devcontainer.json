@@ -4,7 +4,16 @@
   "name": "Palabras",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
-  "runArgs": ["--name", "palabras"],
+  "runArgs": [
+    "--name",
+    "palabras-quasar",
+    "-m",
+    "2048M"
+  ],
+  "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y",
+  "remoteEnv": {
+    // "NODE_PATH": "/tmp/palabras_node_modules"
+  },
   // Features to add to the dev container. More info: https://containers.dev/features.
   // "features": {},
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -14,7 +23,10 @@
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
-      "extensions": ["Vue.volar", "esbenp.prettier-vscode"]
+      "extensions": [
+        "Vue.volar",
+        "esbenp.prettier-vscode"
+      ]
     }
   }
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
