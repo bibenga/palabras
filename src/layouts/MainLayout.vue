@@ -5,7 +5,7 @@
         <q-toolbar-title :shrink="false">
           <router-link to="/" class="text-white" style="text-decoration: none">
             <q-avatar icon="translate" />
-            Aprende palabras
+            Palabras
           </router-link>
         </q-toolbar-title>
 

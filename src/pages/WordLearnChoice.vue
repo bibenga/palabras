@@ -5,8 +5,8 @@
   >
     <q-card flat :bordered="!$q.screen.xs" class="learn2-form">
       <q-card-section>
-        <div class="text-h6">Ejercicio v2</div>
-        <div class="text-overline">recoger las palabras</div>
+        <div class="text-h6">Exercise 2</div>
+        <div class="text-overline">pick up the words</div>
       </q-card-section>
 
       <q-separator />
@@ -46,7 +46,7 @@
         <q-btn
           v-if="task?.isDoneFlg || rows.length == correct.length"
           @click="() => newTask()"
-          label="Siguiente"
+          label="Next"
           unelevated
           class="btn"
           color="positive"
@@ -54,7 +54,7 @@
         <q-btn
           v-else
           @click="() => newTask()"
-          label="Siguiente"
+          label="Skip"
           unelevated
           class="btn"
           color="primary"

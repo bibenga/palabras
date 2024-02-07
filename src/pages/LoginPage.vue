@@ -3,18 +3,14 @@
     <q-form @submit.prevent="login" class="login-form">
       <q-card :flat="$q.screen.xs">
         <q-card-section>
-          <div class="text-h6">Inicia sesión</div>
+          <div class="text-h6">Palabras</div>
           <div class="text-subtitle2">by bibenga</div>
         </q-card-section>
 
         <q-card-section>
           <q-tabs narrow-indicator>
-            <q-route-tab
-              label="Inicia sesión"
-              name="login"
-              to="/login"
-            ></q-route-tab>
-            <q-route-tab label="Registrarse" name="rgister" to="/register">
+            <q-route-tab label="Sign in" name="login" to="/login"></q-route-tab>
+            <q-route-tab label="Sign up" name="rgister" to="/register">
             </q-route-tab>
           </q-tabs>
         </q-card-section>
@@ -108,7 +104,7 @@ const errorMessage = ref('');
 const usernameRef = ref<QInput>();
 const passwordRef = ref<QInput>();
 const username = ref<string>(
-  'olala-AE92ED63-7F80-4FD5-B875-5D72A9774510@gmail.com'
+  'olala-AE92ED63-7F80-4FD5-B875-5D72A9774510@gmail.com',
 );
 const password = ref<string>('9B725739-9470-4237-8A75-0B2391BAA4C6');
 const valid = ref<boolean>();
