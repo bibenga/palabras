@@ -24,16 +24,19 @@
           </q-banner>
 
           <q-input
-            ref="usernameRef"
             clearable
             outlined
             v-model.trim="username"
             label="Username *"
             :error="valid === false"
             error-message="Unvalid username or password"
+            :rules="[
+              (val) => !!val || 'Field is required',
+              (val, rules) =>
+                rules.email(val) || 'Please enter a valid email address',
+            ]"
           />
           <q-input
-            ref="passwordRef"
             clearable
             outlined
             v-model.trim="password"
@@ -41,6 +44,7 @@
             label="Password *"
             :error="valid === false"
             error-message="Unvalid username or password"
+            :rules="[(val) => !!val || 'Field is required']"
           />
         </q-card-section>
 
@@ -101,8 +105,6 @@ const router = useRouter();
 const route = useRoute();
 
 const errorMessage = ref('');
-const usernameRef = ref<QInput>();
-const passwordRef = ref<QInput>();
 const username = ref<string>();
 const password = ref<string>();
 const valid = ref<boolean>();
