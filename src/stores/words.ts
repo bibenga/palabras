@@ -199,7 +199,6 @@ export const useWordsStore = defineStore('words', () => {
     try {
       const pairSep = /\s*-\s*/;
       const newWords = text
-        .toLowerCase()
         .split(/[\r\n]+/)
         .map((line) => line.trim())
         .filter((line) => line.length == 0 || !line.startsWith('#'))
