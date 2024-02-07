@@ -212,7 +212,7 @@ export const useTasksStore = defineStore('tasks', () => {
         console.error(error);
       }
       try {
-        await wordsStore.markWordAsLearned(t.words[0].wordId);
+        await wordsStore.markWordAsLearned(task.words[0].wordId);
       } catch (error) {
         console.error(error);
       }

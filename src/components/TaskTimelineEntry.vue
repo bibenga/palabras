@@ -41,9 +41,7 @@ const type = computed(() => {
   } else if (task.type == 'choice') {
     return 'Choice';
   }
-  {
-    return 'Unknown';
-  }
+  return 'Unknown';
 });
 
 const iconName = computed(() => {
