@@ -157,7 +157,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
       return randomWord != null;
     } else if (type == 'choice') {
-      const randomWords = wordsStore.randomWords(5, null);
+      const randomWords = wordsStore.randomWords(7, null);
       if (randomWords.length > 0) {
         const words = [] as TaskWord[];
 
