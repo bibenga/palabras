@@ -1,9 +1,9 @@
 in a sense - в некотором смысле
 eagerly - охотно
-exhausted - сильно уставший, выдохшийся
-certain - уверенный, убежденный
-crucial - ключевой, решающий
-credible - достоверный, надежный
+exhausted - сильно уставший; выдохшийся
+certain - уверенный; убежденный
+crucial - ключевой; решающий
+credible - достоверный; надежный
 Shall we begin? - Может, начнем?
 Good god - Боже милостивый
 I'll do the rest - Я сделаю все остальное
@@ -26,4 +26,4 @@ fewer - меньше
 because of - потому что
 participate - участвовать
 headphones - наушники
-college - колледж, старшие классы средней школы
+college - колледж

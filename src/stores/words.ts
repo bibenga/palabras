@@ -192,16 +192,20 @@ export const useWordsStore = defineStore('words', () => {
     await batch.commit();
   };
 
-  const parseAndSaveWords = async (text: string): Promise<number> => {
+  const parseAndSaveWords = async (
+    text: string,
+    wordSep = /\s*,\s*/,
+  ): Promise<number> => {
     try {
+      const pairSep = /\s*-\s*/;
       const newWords = text
         .toLowerCase()
         .split(/[\r\n]+/)
         .map((line) => line.trim())
         .filter((line) => line.length == 0 || !line.startsWith('#'))
-        .map((line) => line.split(/\s*-\s*/))
+        .map((line) => line.split(pairSep))
         .filter((line) => line.length == 2)
-        .map((line) => [line[0].split(/\s*,\s*/), line[1].split(/\s*,\s*/)]);
+        .map((line) => [line[0].split(wordSep), line[1].split(wordSep)]);
 
       const batch = writeBatch(firestore);
       for (const pair of newWords) {
@@ -224,33 +228,24 @@ export const useWordsStore = defineStore('words', () => {
     }
   };
 
-  const loadEsRuDemoWords = async (): Promise<number> => {
+  const loadDemoWords = async (code: string): Promise<number> => {
     try {
-      const newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
-      return await parseAndSaveWords(newWordsRaw);
+      let newWordsRaw;
+      let wordSep = /\s*,\s*/;
+      if (code === 'es-ru') {
+        newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
+      } else if (code == 'es-en') {
+        newWordsRaw = (await import('../assets/es-en.txt?raw')).default;
+      } else if (code == 'en-ru') {
+        newWordsRaw = (await import('../assets/en-ru.txt?raw')).default;
+        wordSep = /\s*;\s*/;
+      } else {
+        throw new Error(`the code "${code}" is not supported`);
+      }
+      return await parseAndSaveWords(newWordsRaw, wordSep);
     } catch (error) {
       console.error(error);
-      return -1;
-    }
-  };
-
-  const loadEsEnDemoWords = async (): Promise<number> => {
-    try {
-      const newWordsRaw = (await import('../assets/es-en.txt?raw')).default;
-      return await parseAndSaveWords(newWordsRaw);
-    } catch (error) {
-      console.error(error);
-      return -1;
-    }
-  };
-
-  const loadEnRuDemoWords = async (): Promise<number> => {
-    try {
-      const newWordsRaw = (await import('../assets/en-ru.txt?raw')).default;
-      return await parseAndSaveWords(newWordsRaw);
-    } catch (error) {
-      console.error(error);
-      return -1;
+      throw error;
     }
   };
 
@@ -265,8 +260,6 @@ export const useWordsStore = defineStore('words', () => {
     markWordAsLearned,
     deleteWord,
     deleteWords,
-    loadEsRuDemoWords,
-    loadEsEnDemoWords,
-    loadEnRuDemoWords,
+    loadDemoWords,
   };
 });

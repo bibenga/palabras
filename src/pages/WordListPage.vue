@@ -33,7 +33,7 @@
 
       <template v-slot:top>
         <q-btn
-          @click="() => loadEsRuDemoWords()"
+          @click="() => loadDemoWords('es-ru')"
           v-if="ready && words.length == 0"
           unelevated
           outline
@@ -43,7 +43,7 @@
           icon="add"
         />
         <q-btn
-          @click="() => loadEsEnDemoWords()"
+          @click="() => loadDemoWords('es-en')"
           v-if="ready && words.length == 0"
           unelevated
           outline
@@ -53,7 +53,7 @@
           icon="add"
         />
         <q-btn
-          @click="() => loadEnRuDemoWords()"
+          @click="() => loadDemoWords('en-ru')"
           v-if="ready && words.length == 0"
           unelevated
           outline
@@ -285,39 +285,11 @@ const columns = [
   },
 ];
 
-const loadEsRuDemoWords = async () => {
-  console.log('loadEsRuDemoWords');
+const loadDemoWords = async (code: string) => {
+  console.log(`loadDemoWords: ${code}`);
   $q.loading.show();
   try {
-    const loaded = await wordsStore.loadEsRuDemoWords();
-    $q.notify({
-      message: `Was added ${loaded} word pair`,
-      timeout: 2000,
-    });
-  } finally {
-    $q.loading.hide();
-  }
-};
-
-const loadEsEnDemoWords = async () => {
-  console.log('loadEsEnDemoWords');
-  $q.loading.show();
-  try {
-    const loaded = await wordsStore.loadEsEnDemoWords();
-    $q.notify({
-      message: `Was added ${loaded} word pair`,
-      timeout: 2000,
-    });
-  } finally {
-    $q.loading.hide();
-  }
-};
-
-const loadEnRuDemoWords = async () => {
-  console.log('loadEnRuDemoWords');
-  $q.loading.show();
-  try {
-    const loaded = await wordsStore.loadEnRuDemoWords();
+    const loaded = await wordsStore.loadDemoWords(code);
     $q.notify({
       message: `Was added ${loaded} word pair`,
       timeout: 2000,
