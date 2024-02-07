@@ -8,7 +8,7 @@
     "--name",
     "palabras-quasar",
     "-m",
-    "2048M"
+    "2560M"
   ],
   "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y",
   "remoteEnv": {
