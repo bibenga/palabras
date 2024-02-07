@@ -86,10 +86,8 @@ const errorMessage = ref('');
 const usernameRef = ref<QInput>();
 const passwordRef = ref<QInput>();
 // const codeRef = ref<QInput>();
-const username = ref<string>(
-  'olala-AE92ED63-7F80-4FD5-B875-5D72A9774510@gmail.com',
-);
-const password = ref<string>('9B725739-9470-4237-8A75-0B2391BAA4C6');
+const username = ref<string>();
+const password = ref<string>();
 // const code = ref<string>('4729');
 
 const fireauth = inject<Auth>('fireauth');
