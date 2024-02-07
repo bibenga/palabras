@@ -36,3 +36,4 @@ yarn-error.log*
 .firebase
 .firebaserc
 src/**/firebase.json
+demo-user.txt
