@@ -44,11 +44,6 @@
             <q-tooltip class="bg-primary">Logout</q-tooltip>
           </q-btn>
         </template>
-        <template v-else>
-          <q-btn stretch flat icon="login" to="/login">
-            <q-tooltip class="bg-primary">Login</q-tooltip>
-          </q-btn>
-        </template>
       </q-toolbar>
     </q-header>
 
