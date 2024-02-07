@@ -28,9 +28,9 @@
               icon="school"
               to="/learn/translation"
             >
-              <q-tooltip class="bg-primary"
-                >Learn words as translation</q-tooltip
-              >
+              <q-tooltip class="bg-primary">
+                Learn words as translation
+              </q-tooltip>
             </q-route-tab>
             <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
               <q-tooltip class="bg-primary">Learn words as choice</q-tooltip>
