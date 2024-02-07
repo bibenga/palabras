@@ -66,6 +66,16 @@
           class="btn"
           color="positive"
         />
+        <q-btn
+          v-if="task != null && !answerIsValid"
+          @click="() => openDictionary()"
+          label="Dictionary"
+          icon="translate"
+          unelevated
+          class="btn"
+          color="primary"
+          outline
+        />
         <q-space v-if="!$q.screen.xs" />
         <q-btn
           v-if="task != null && !answerIsValid"
@@ -91,6 +101,8 @@
     </q-card>
   </q-page>
 </template>
+
+<!-- https://translate.google.ru/?sl=en&tl=ru&text=dwarf1&op=translate -->
 
 <style scoped>
 .screen--xs .learn-form {
@@ -182,6 +194,9 @@ const markAsLearned = async () => {
     cancel: true,
     focus: 'cancel',
   }).onOk(async () => {
+    if (!task.value) {
+      return;
+    }
     $q.loading.show();
     try {
       await tasksStore.markAsLearned(task.value);
@@ -239,6 +254,23 @@ const nextTask = async () => {
   } finally {
     $q.loading.hide();
   }
+};
+
+const openDictionary = () => {
+  if (!task.value) {
+    return;
+  }
+  const text = task.value.words[0].word1.join('; ');
+  const query = new URLSearchParams();
+  var tl = 'ru';
+  if (/^[а-яА-Я]+$/.test(text)) {
+    tl = 'en';
+  }
+  query.append('sl', 'auto');
+  query.append('tl', tl);
+  query.append('op', 'translate');
+  query.append('text', text);
+  window.open(`https://translate.google.ru/?${query}`, '_blank');
 };
 
 onUnmounted(() => {
