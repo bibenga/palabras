@@ -52,6 +52,7 @@
           v-if="task != null && !answerIsValid"
           @click="() => validateAnswer()"
           label="Check"
+          icon="question_mark"
           unelevated
           class="btn"
           color="primary"
@@ -60,6 +61,7 @@
           v-else
           @click="() => nextTask()"
           label="Next"
+          icon="autorenew"
           unelevated
           class="btn"
           color="positive"
@@ -69,6 +71,7 @@
           v-if="task != null && !answerIsValid"
           @click="() => skipTask()"
           label="Skip"
+          icon="autorenew"
           unelevated
           class="btn"
           color="primary"
@@ -78,6 +81,7 @@
           v-if="task != null && !answerIsValid"
           @click="() => markAsLearned()"
           label="Mark as known"
+          icon="done"
           unelevated
           class="btn"
           color="primary"
@@ -106,7 +110,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
+import { onUnmounted, ref, computed } from 'vue';
 import { useTasksStore } from 'src/stores/tasks';
 import { storeToRefs } from 'pinia';
 import deburr from 'lodash/deburr';
@@ -136,8 +140,14 @@ const task = computed(() => {
 const answerInput = ref();
 const answer = ref('');
 const answerIsValid = ref<boolean>();
+let nextTaskTimer = null;
 
 const newTask = async () => {
+  if (!!nextTaskTimer) {
+    clearTimeout(nextTaskTimer);
+    nextTaskTimer = null;
+  }
+
   if (task.value && !task.value.isDoneFlg && !task.value.isSkipedFlg) {
     await tasksStore.markAsSkiped(task.value);
   }
@@ -208,6 +218,7 @@ const validateAnswer = async () => {
   answerIsValid.value = valid;
   if (valid) {
     await tasksStore.markAsDone(t);
+    nextTaskTimer = setTimeout(newTask, 2000);
   } else {
     answerInput.value.focus();
   }
@@ -229,4 +240,11 @@ const nextTask = async () => {
     $q.loading.hide();
   }
 };
+
+onUnmounted(() => {
+  if (!!nextTaskTimer) {
+    clearTimeout(nextTaskTimer);
+    nextTaskTimer = null;
+  }
+});
 </script>

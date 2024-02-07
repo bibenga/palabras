@@ -47,6 +47,7 @@
           v-if="task?.isDoneFlg || rows.length == correct.length"
           @click="() => newTask()"
           label="Next"
+          icon="autorenew"
           unelevated
           class="btn"
           color="positive"
@@ -55,6 +56,7 @@
           v-else
           @click="() => newTask()"
           label="Skip"
+          icon="autorenew"
           unelevated
           class="btn"
           color="primary"
@@ -170,10 +172,17 @@ const correct = ref<string[]>([]);
 const incorrect = ref(false);
 const leftSelected = ref('');
 const rightSelected = ref('');
+let nextTaskTimer = null;
+let errorTimer = null;
 
 const newTask = async () => {
   $q.loading.show();
   try {
+    if (!!nextTaskTimer) {
+      clearTimeout(nextTaskTimer);
+      nextTaskTimer = null;
+    }
+
     if (task.value && !task.value.isDoneFlg && !task.value.isSkipedFlg) {
       await tasksStore.markAsSkiped(task.value);
     }
@@ -223,7 +232,6 @@ const getOutline = (wordId: string, selectedWordId: string): boolean => {
   return wordId != selectedWordId;
 };
 
-let errorTimer = null;
 const validate = async (): Promise<void> => {
   if (leftSelected.value === '' || rightSelected.value === '') {
     return;
@@ -243,12 +251,18 @@ const validate = async (): Promise<void> => {
   }
   if (task.value?.words.length === correct.value.length) {
     await tasksStore.markAsDone(task.value);
+    nextTaskTimer = setTimeout(newTask, 2000);
   }
 };
+
 onUnmounted(() => {
   if (!!errorTimer) {
     clearTimeout(errorTimer);
     errorTimer = null;
+  }
+  if (!!nextTaskTimer) {
+    clearTimeout(nextTaskTimer);
+    nextTaskTimer = null;
   }
 });
 
