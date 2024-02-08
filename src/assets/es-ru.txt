@@ -2,7 +2,7 @@ gente - люди
 persona - человек
 hombre - мужчина
 marido - муж
-mujer - женщина, жена
+mujer - женщина; жена
 niño - ребенок
 muchacho - мальчик
 muchacha - девочка
@@ -17,8 +17,8 @@ hijo - сын
 hija - дочь
 abuelo - дед
 abuela - бабушка
-suegro - тесть, свекор
-suegra - теща, свекровь
+suegro - тесть; свекор
+suegra - теща; свекровь
 tío - дядя
 tía - тетя
 hermano - брат
@@ -55,7 +55,7 @@ lugar - место
 casa - дом
 iglesia - церковь
 río - река
-café - кафе, кофе
+café - кафе; кофе
 hotel - гостиница
 jardín - сад
 parque - парк
@@ -69,7 +69,7 @@ hospital - больница
 mercado - рынок
 policía - полиция
 oficina de correos - почта
-estación - станция, вокзал
+estación - станция; вокзал
 centro - центр
 tienda - магазин
 montaña - гора
@@ -110,7 +110,7 @@ baya - ягода
 miel - мёд
 mermelada - варенье
 seta - гриб
-cebolla - лук репчатый, репчатый лук
+cebolla - лук репчатый; репчатый лук
 banana - банан
 zanahoria - морковь
 pera - груша
@@ -118,7 +118,7 @@ remolacha - свекла
 fruta - фрукты
 melón - дыня
 sandía - арбуз
-pastel - пирожное, пирожок
+pastel - пирожное; пирожок
 tarta - торт
 chocolate - шоколад
 carne - мясо
@@ -178,15 +178,15 @@ autobús - автобус
 tren - поезд
 bicicleta - велосипед
 
-tiempo - время, погода
+tiempo - время; погода
 año - год
 semana - неделя
 hora - час
 minuto - минута
 ayer - вчера
 hoy - сегодня
-mañana - завтра, утро
-fiesta - праздник, вечеринка
+mañana - завтра; утро
+fiesta - праздник; вечеринка
 vez - раз
 
 día - день
@@ -220,7 +220,7 @@ verano - лето
 otoño - осень
 invierno - зима
 
-nombre - имя, фамилия
+nombre - имя; фамилия
 dirección - адрес
 número - номер
 cumpleaños - день рождения
@@ -239,18 +239,18 @@ plancha - утюг
 jabón - мыло
 radio - радио
 bolsa - сумка
-mapa - карта, открытка
+mapa - карта; открытка
 maleta - чемодан
 regalo - подарок
-cámara - фотоаппарат, видеокамера
+cámara - фотоаппарат; видеокамера
 ordenador - компьютер
-película - фильм, плёнка
+película - фильм; плёнка
 flor - цветок
 florero - ваза
 cuadro - картина
 pañuelo - носовой платок
 bola - мяч
-globo - воздушный шар, воздушный шарик
+globo - воздушный шар; воздушный шарик
 juguete - игрушка
 cuenta - счёт
 sobre - конверт
@@ -267,7 +267,7 @@ camisa - рубашка
 falda - юбка
 guante - перчатка
 sombrero - шляпа
-chaqueta - пиджак, куртка
+chaqueta - пиджак; куртка
 bufanda - шарф
 calcetín - носок
 suéter - свитер
@@ -284,7 +284,7 @@ nariz - нос
 boca - рот
 oreja - ухо
 
-qué - что, какой
+qué - что; какой
 cual - какой
 quién - кто
 dónde - где
@@ -307,7 +307,7 @@ ellas - они
 
 mi - мой
 tu - твой
-su - его, ее, их, Ваш
+su - его; ее; их; Ваш
 nuestro - наш
 vuestro - ваш
 
@@ -318,7 +318,7 @@ debajo de - под
 detrás de - позади
 con - с
 sin - без
-antes de - до, прежде
+antes de - до; прежде
 después de - после
 delante de - перед
 entre - между
@@ -368,19 +368,19 @@ bien - хорошо
 mal - плохо
 temprano - ранний
 tarde - поздний
-pasado - последний, прошлый
+pasado - последний; прошлый
 próximo - следующий
 libre - свободный
-caliente - тёплый, горячий
+caliente - тёплый; горячий
 frío - холодный
 alto - высокий
 bajo - низкий
-largo - длинный, долгий
+largo - длинный; долгий
 corto - короткий
-fácil - лёгкий, несложный
-difícil - тяжёлый, трудный
-ligero - легкий, по весу
-pesado - тяжелый, по весу
+fácil - лёгкий; несложный
+difícil - тяжёлый; трудный
+ligero - легкий; по весу
+pesado - тяжелый; по весу
 oscuro - тёмный
 claro - светлый
 caro - дорогой
@@ -399,10 +399,10 @@ alegre - радостный
 feliz - счастливый
 listo - готовый
 enojado - сердитый
-principal - основной, главный
+principal - основной; главный
 
 negro - чёрный
-azul - голубой, синий
+azul - голубой; синий
 marrón - коричневый
 verde - зелёный
 gris - серый
@@ -411,41 +411,41 @@ blanco - белый
 amarillo - жёлтый
 
 sí - да
-no - нет, не
+no - нет; не
 este - этот
 ese - тот
-aquel - тот, дальше чем ese
+aquel - тот; дальше чем ese
 que - что
 aquí - здесь
 allí - там
 acá- сюда
 allá - туда
-ahora - сейчас, теперь
+ahora - сейчас; теперь
 ya - уже
 todavía - еще
-mucho,mucha,muchos,muchas - много
-poco,poca,pocos,pocas - мало
+mucho;mucha;muchos;muchas - много
+poco;poca;pocos;pocas - мало
 muy - очень
 cada - каждый
 todos - все
 todo - всё
 tan - так
-también - так же, тоже
+también - так же; тоже
 
 y - и
 o - или
 pero - но
-porque - потому что, так как
+porque - потому что; так как
 
-ser - быть, являться
-estar - быть, находиться, стоять
+ser - быть; являться
+estar - быть; находиться; стоять
 tener - иметь
 poder - мочь
 deber - должен
 vivir - жить
-permanecer - оставаться, останавливаться
-venir - приходить, приезжать
-ir - идти, ехать
+permanecer - оставаться; останавливаться
+venir - приходить; приезжать
+ir - идти; ехать
 ver - видеть
 sentar - сидеть
 decir - сказать
@@ -458,10 +458,10 @@ comprar - покупать
 nadar - плавать
 dormir - спать
 despertar - будить
-lavar - мыть, cтирать
+lavar - мыть; cтирать
 probar - пробовать
 encontrar - находить
-traer - приносить, привозить
+traer - приносить; привозить
 celebrar - праздновать
 sonreír - улыбаться
 llorar - плакать
@@ -500,12 +500,12 @@ leer - читать
 jugar - играть
 fumar - курить
 crear - создавать
-luchar - бороться, драться
+luchar - бороться; драться
 
 gracias - спасибо
-perdón - извини, извините
-por favor - пожалуйста, прошу
-de nada - пожалуйста, не за что
+perdón - извини; извините
+por favor - пожалуйста; прошу
+de nada - пожалуйста; не за что
 qué lástima - жаль
 hasta la vista - до свидания
 

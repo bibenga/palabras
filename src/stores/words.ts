@@ -56,11 +56,7 @@ export const useWordsStore = defineStore('words', () => {
       words.value = [];
       return;
     }
-    const wordsQuery = query(
-      wordsCol,
-      where('userId', '==', user.uid),
-      orderBy('word1', 'asc'),
-    );
+    const wordsQuery = query(wordsCol, where('userId', '==', user.uid), orderBy('word1', 'asc'));
     wordsUnsubscribe = onSnapshot(wordsQuery, (snapshot) => {
       const res = [];
       for (const wordDoc of snapshot.docs) {
@@ -105,9 +101,7 @@ export const useWordsStore = defineStore('words', () => {
     return null;
   };
 
-  const randomWord = async (
-    ignoreIds: string[] | null | undefined,
-  ): Promise<Word | null> => {
+  const randomWord = async (ignoreIds: string[] | null | undefined): Promise<Word | null> => {
     const items = words.value;
     if (items != null && items.length > 0) {
       if (items.length == 1) {
@@ -125,10 +119,7 @@ export const useWordsStore = defineStore('words', () => {
     return null;
   };
 
-  const randomWords = (
-    expected: number,
-    ignoreIds: string[] | null | undefined,
-  ): Word[] => {
+  const randomWords = (expected: number, ignoreIds: string[] | null | undefined): Word[] => {
     let items = [...words.value];
     if (ignoreIds) {
       items = items.filter((item) => !ignoreIds.includes(item.id));
@@ -192,10 +183,7 @@ export const useWordsStore = defineStore('words', () => {
     await batch.commit();
   };
 
-  const parseAndSaveWords = async (
-    text: string,
-    wordSep = /\s*,\s*/,
-  ): Promise<number> => {
+  const parseAndSaveWords = async (text: string, wordSep = /\s*;\s*/): Promise<number> => {
     try {
       const pairSep = /\s*-\s*/;
       const newWords = text
@@ -230,18 +218,16 @@ export const useWordsStore = defineStore('words', () => {
   const loadDemoWords = async (code: string): Promise<number> => {
     try {
       let newWordsRaw;
-      let wordSep = /\s*,\s*/;
       if (code === 'es-ru') {
         newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
       } else if (code == 'es-en') {
         newWordsRaw = (await import('../assets/es-en.txt?raw')).default;
       } else if (code == 'en-ru') {
         newWordsRaw = (await import('../assets/en-ru.txt?raw')).default;
-        wordSep = /\s*;\s*/;
       } else {
         throw new Error(`the code "${code}" is not supported`);
       }
-      return await parseAndSaveWords(newWordsRaw, wordSep);
+      return await parseAndSaveWords(newWordsRaw);
     } catch (error) {
       console.error(error);
       throw error;

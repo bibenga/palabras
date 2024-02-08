@@ -1,8 +1,8 @@
 # Pronouns
 
-se - to him, to her
+se - to him; to her
 lo - him
-le - to him, her
+le - to him; her
 me - me
 él - he
 ella - she
@@ -404,7 +404,7 @@ comercial - commercial
 familiar - familiar
 amplio - extensive
 educativo - educational
-vivo - live, alive
+vivo - live; alive
 similar - similar
 rojo - red
 financiero - financial
@@ -526,7 +526,7 @@ ser - be
 estar - be
 tener - have
 hacer - make
-poder - be able to, can
+poder - be able to; can
 decir - say
 haber - have
 ir - go
@@ -957,7 +957,7 @@ adentro - inside
 # Prepositions
 
 de - from
-en - at, in, on
+en - at; in; on
 a - to
 con - with
 por - by
@@ -966,7 +966,7 @@ sobre - about
 entre - between
 sin - without
 desde - from
-hasta - to, until
+hasta - to; until
 durante - during
 hacia - to
 ante - before
