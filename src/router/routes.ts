@@ -6,7 +6,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       // { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: '', redirect: '/progress' },
+      { path: '', redirect: '/dashboard' },
       { path: 'login', component: () => import('pages/LoginPage.vue') },
       {
         path: 'register',
@@ -34,8 +34,8 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
-        path: 'progress',
-        component: () => import('pages/WordProgressPage.vue'),
+        path: 'dashboard',
+        component: () => import('pages/WordDashboardPage.vue'),
         meta: { requiresAuth: true },
       },
     ],

@@ -115,7 +115,7 @@ const redirectOnLogin = () => {
   const to =
     route.query.redirect && typeof route.query.redirect === 'string'
       ? route.query.redirect
-      : '/progress';
+      : '/dashboard';
   console.debug(`redirect to ${to}`);
   router.push(to);
 };

@@ -20,8 +20,8 @@
 
         <template v-if="user">
           <q-tabs v-if="!$q.screen.xs" class="bg-primary text-white">
-            <q-route-tab name="progress" icon="dashboard" to="/progress">
-              <q-tooltip class="bg-primary">Progress</q-tooltip>
+            <q-route-tab name="dashboard" icon="dashboard" to="/dashboard">
+              <q-tooltip class="bg-primary">Dashboard</q-tooltip>
             </q-route-tab>
             <q-route-tab
               name="learn-translation"
@@ -74,8 +74,8 @@
       </q-banner>
       <q-toolbar v-if="user != null && $q.screen.xs">
         <q-tabs class="bg-primary text-white" switch-indicator align="justify">
-          <q-route-tab name="progress" icon="dashboard" to="/progress">
-            <q-tooltip class="bg-primary">Progress</q-tooltip>
+          <q-route-tab name="dashboard" icon="dashboard" to="/dashboard">
+            <q-tooltip class="bg-primary">Dashboard</q-tooltip>
           </q-route-tab>
           <q-route-tab
             name="learn-translation"
