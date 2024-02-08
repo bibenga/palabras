@@ -2,21 +2,9 @@
   <q-page v-if="ready">
     <div class="q-px-lg q-py-md">
       <q-timeline v-if="tasks.length > 0" color="secondary">
-        <TaskTimelineEntries
-          :tasks="today"
-          label="Today"
-          timeFormat="timeAgo"
-        />
-        <TaskTimelineEntries
-          :tasks="yeasterday"
-          label="Yeasterday"
-          timeFormat="time"
-        />
-        <TaskTimelineEntries
-          :tasks="previously"
-          label="Previously"
-          timeFormat="full"
-        />
+        <TaskTimelineEntries :tasks="today" label="Today" timeFormat="timeAgo" />
+        <TaskTimelineEntries :tasks="yeasterday" label="Yeasterday" timeFormat="time" />
+        <TaskTimelineEntries :tasks="previously" label="Previously" timeFormat="full" />
       </q-timeline>
       <div v-else>You do not worked!</div>
     </div>

@@ -1,8 +1,5 @@
 <template>
-  <q-page
-    v-if="ready"
-    :class="$q.screen.xs ? '' : 'row justify-center items-center'"
-  >
+  <q-page v-if="ready" :class="$q.screen.xs ? '' : 'row justify-center items-center'">
     <q-card flat :bordered="!$q.screen.xs" class="learn-form">
       <q-card-section>
         <div class="text-h6">Exercise</div>
@@ -209,8 +206,7 @@ const markAsLearned = async () => {
 
 const splitRule = /[ \r\n¡!¿?.,:;'\"]+/;
 // const convert = (s: string) => s.toLowerCase().normalize('NFKD').split(splitRule);
-const convert = (s: string): string[] =>
-  deburr(s.toLowerCase()).split(splitRule);
+const convert = (s: string): string[] => deburr(s.toLowerCase()).split(splitRule);
 
 const validateAnswer = async () => {
   const t = task.value;

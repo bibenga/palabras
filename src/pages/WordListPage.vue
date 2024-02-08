@@ -299,7 +299,7 @@ const loadDemoWords = async (code: string) => {
   }
 };
 
-const add = async () => {
+const add = () => {
   router.push('/word/new');
 };
 
@@ -308,7 +308,7 @@ const add = async () => {
 //   router.push(`/word/${doc.id}`);
 // };
 
-const rowClicked = async (row) => {
+const rowClicked = (row) => {
   console.log('rowClicked', row.id);
   router.push(`/word/${row.id}`);
 };

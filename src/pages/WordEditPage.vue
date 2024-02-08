@@ -135,7 +135,7 @@ onMounted(() => {
         load();
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 });
 
@@ -144,22 +144,13 @@ const save = async () => {
   try {
     if (isNew) {
       try {
-        await wordsStore.createWord(
-          word1.value,
-          word2.value,
-          isLearnedFlg.value
-        );
+        await wordsStore.createWord(word1.value, word2.value, isLearnedFlg.value);
       } catch (error) {
         console.error(error);
       }
     } else {
       try {
-        await wordsStore.updateWord(
-          props.id,
-          word1.value,
-          word2.value,
-          isLearnedFlg.value
-        );
+        await wordsStore.updateWord(props.id, word1.value, word2.value, isLearnedFlg.value);
       } catch (error) {
         console.error(error);
       }

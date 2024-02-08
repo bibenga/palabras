@@ -10,16 +10,12 @@
         <q-card-section>
           <q-tabs narrow-indicator>
             <q-route-tab label="Sign in" name="login" to="/login"></q-route-tab>
-            <q-route-tab label="Sign up" name="rgister" to="/register">
-            </q-route-tab>
+            <q-route-tab label="Sign up" name="rgister" to="/register"> </q-route-tab>
           </q-tabs>
         </q-card-section>
 
         <q-card-section>
-          <q-banner
-            v-if="errorMessage"
-            class="text-white bg-red q-mb-md rounded-borders"
-          >
+          <q-banner v-if="errorMessage" class="text-white bg-red q-mb-md rounded-borders">
             {{ errorMessage }}
           </q-banner>
 
@@ -32,8 +28,7 @@
             error-message="Unvalid username or password"
             :rules="[
               (val) => !!val || 'Field is required',
-              (val, rules) =>
-                rules.email(val) || 'Please enter a valid email address',
+              (val, rules) => rules.email(val) || 'Please enter a valid email address',
             ]"
           />
           <q-input
@@ -51,13 +46,7 @@
         <q-separator v-if="$q.platform.is.desktop" />
 
         <q-card-actions>
-          <q-btn
-            label="Login"
-            type="submit"
-            class="login-btn"
-            color="primary"
-            icon="login"
-          />
+          <q-btn label="Login" type="submit" class="login-btn" color="primary" icon="login" />
 
           <q-btn
             label="Google"

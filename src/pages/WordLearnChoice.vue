@@ -1,8 +1,5 @@
 <template>
-  <q-page
-    v-if="ready"
-    :class="$q.screen.xs ? '' : 'row justify-center items-center'"
-  >
+  <q-page v-if="ready" :class="$q.screen.xs ? '' : 'row justify-center items-center'">
     <q-card flat :bordered="!$q.screen.xs" class="learn2-form">
       <q-card-section>
         <div class="text-h6">Exercise 2</div>
@@ -147,12 +144,8 @@ const rows = computed(() => {
   const words = task.value?.words;
   const res: ButtonRow[] = [];
   if (words) {
-    const left = [...words].sort(
-      (i1, i2) => i1.word1position - i2.word1position,
-    );
-    const right = [...words].sort(
-      (i1, i2) => i1.word2position - i2.word2position,
-    );
+    const left = [...words].sort((i1, i2) => i1.word1position - i2.word1position);
+    const right = [...words].sort((i1, i2) => i1.word2position - i2.word2position);
     for (let i = 0; i < words.length; i++) {
       const l = left[i];
       const r = right[i];

@@ -23,14 +23,8 @@
             <q-route-tab name="dashboard" icon="dashboard" to="/dashboard">
               <q-tooltip class="bg-primary">Dashboard</q-tooltip>
             </q-route-tab>
-            <q-route-tab
-              name="learn-translation"
-              icon="school"
-              to="/learn/translation"
-            >
-              <q-tooltip class="bg-primary">
-                Learn words as translation
-              </q-tooltip>
+            <q-route-tab name="learn-translation" icon="school" to="/learn/translation">
+              <q-tooltip class="bg-primary"> Learn words as translation </q-tooltip>
             </q-route-tab>
             <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
               <q-tooltip class="bg-primary">Learn words as choice</q-tooltip>
@@ -55,21 +49,11 @@
       v-if="!isAcceptedCookieConsent || (user != null && $q.screen.xs)"
       class="fixed-bottom"
     >
-      <q-banner
-        v-if="!isAcceptedCookieConsent"
-        dense
-        inline-actions
-        class="text-white bg-red"
-      >
-        This website uses cookies to improve your experience. We'll assume
-        you're ok with this, but you can opt-out if you wish.
+      <q-banner v-if="!isAcceptedCookieConsent" dense inline-actions class="text-white bg-red">
+        This website uses cookies to improve your experience. We'll assume you're ok with this, but
+        you can opt-out if you wish.
         <template v-slot:action>
-          <q-btn
-            flat
-            color="white"
-            label="Accept"
-            @click="() => setCookieConsent()"
-          />
+          <q-btn flat color="white" label="Accept" @click="() => setCookieConsent()" />
         </template>
       </q-banner>
       <q-toolbar v-if="user != null && $q.screen.xs">
@@ -77,11 +61,7 @@
           <q-route-tab name="dashboard" icon="dashboard" to="/dashboard">
             <q-tooltip class="bg-primary">Dashboard</q-tooltip>
           </q-route-tab>
-          <q-route-tab
-            name="learn-translation"
-            icon="school"
-            to="/learn/translation"
-          >
+          <q-route-tab name="learn-translation" icon="school" to="/learn/translation">
             <q-tooltip class="bg-primary">Learn words as translation</q-tooltip>
           </q-route-tab>
           <q-route-tab name="learn-choice" icon="list_alt" to="/learn/choice">
@@ -136,11 +116,12 @@ const isAcceptedCookieConsent = ref(
   // $q.localStorage.getItem('AcceptedCookieConsent') === true,
   $q.cookies.get('PalabrasAcceptedCookieConsent') === '1',
 );
-const setCookieConsent = () => {
+
+function setCookieConsent() {
   // $q.localStorage.set('AcceptedCookieConsent', true);
   $q.cookies.set('PalabrasAcceptedCookieConsent', '1', {
     expires: 2,
   });
   isAcceptedCookieConsent.value = true;
-};
+}
 </script>
