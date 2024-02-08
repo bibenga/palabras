@@ -277,7 +277,7 @@ const columns = [
   {
     name: 'isLearnedFlg',
     required: true,
-    label: 'Known',
+    label: 'Learned',
     align: 'center',
     field: (row) => row.isLearnedFlg,
     format: (val) => (val ? 'yes' : 'no'),

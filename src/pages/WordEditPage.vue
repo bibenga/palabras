@@ -57,8 +57,8 @@
           />
           <q-space v-if="!$q.screen.xs" />
           <q-btn
-            @click="() => del()"
             v-if="!isNew"
+            @click="() => del()"
             unelevated
             class="q-ml-sm btn"
             color="negative"
