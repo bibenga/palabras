@@ -88,6 +88,11 @@ module.exports = configure(function (/* ctx */) {
       //     },
       //   ],
       // ],
+      build: {
+        uglifyOptions: {
+          // compress: { drop_console: true },
+        },
+      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
