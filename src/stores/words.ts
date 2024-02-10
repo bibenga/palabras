@@ -101,7 +101,7 @@ export const useWordsStore = defineStore('words', () => {
     return null;
   };
 
-  const randomWord = async (ignoreIds: string[] | null | undefined): Promise<Word | null> => {
+  const randomWord = (ignoreIds: string[] | null = null): Word | null => {
     const items = words.value;
     if (items != null && items.length > 0) {
       if (items.length == 1) {
@@ -119,7 +119,7 @@ export const useWordsStore = defineStore('words', () => {
     return null;
   };
 
-  const randomWords = (expected: number, ignoreIds: string[] | null | undefined): Word[] => {
+  const randomWords = (expected: number, ignoreIds: string[] | null = null): Word[] => {
     let items = [...words.value];
     if (ignoreIds) {
       items = items.filter((item) => !ignoreIds.includes(item.id));

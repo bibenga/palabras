@@ -128,7 +128,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const newTask = async (type: TaskType): Promise<boolean> => {
     if (type === 'translation') {
-      const randomWord = await wordsStore.randomWord(null);
+      const randomWord = wordsStore.randomWord();
       if (randomWord != null) {
         const queryAndAnswer = shuffle([randomWord.word1, randomWord.word2]);
         const word: TaskWord = {
@@ -156,7 +156,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
       return randomWord != null;
     } else if (type == 'choice') {
-      const randomWords = wordsStore.randomWords(7, null);
+      const randomWords = wordsStore.randomWords(7);
       if (randomWords.length > 0) {
         const words = [] as TaskWord[];
 
