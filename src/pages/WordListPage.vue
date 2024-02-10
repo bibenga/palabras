@@ -262,7 +262,7 @@ const columns = [
     label: 'Word1',
     align: 'left',
     field: (row) => row.word1,
-    format: (val) => val?.join(', '),
+    format: (val) => val?.join('; '),
     // style: 'width: 50%; max-width: 50%;',
   },
   {
@@ -271,7 +271,7 @@ const columns = [
     label: 'Word2',
     align: 'left',
     field: (row) => row.word2,
-    format: (val) => val?.join(', '),
+    format: (val) => val?.join('; '),
     // style: 'width: 50%; max-width: 50%;',
   },
   {
@@ -326,7 +326,17 @@ const del = async () => {
       await wordsStore.deleteWords(docs.map((d) => d.id));
       selected.value = [];
       $q.notify({
-        message: `Deleted ${docs.length} documents`,
+        message:
+          docs.length == 1
+            ? 'The document was deleted'
+            : `The ${docs.length} documents were deleted`,
+        timeout: 2000,
+      });
+    } catch (error) {
+      console.error(error);
+      $q.notify({
+        type: 'negative',
+        message: `An error is occurred during delete operation: ${error}!`,
         timeout: 2000,
       });
     } finally {
