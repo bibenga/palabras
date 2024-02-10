@@ -47,7 +47,7 @@
             label="Save"
           />
           <q-btn
-            @click="() => cancel()"
+            @click="cancel"
             outline
             unelevated
             class="q-ml-sm btn"
@@ -58,7 +58,7 @@
           <q-space v-if="!$q.screen.xs" />
           <q-btn
             v-if="!isNew"
-            @click="() => del()"
+            @click="del"
             unelevated
             class="q-ml-sm btn"
             color="negative"
@@ -97,35 +97,10 @@ const props = defineProps<{
 }>();
 
 const title = ref('');
-const isNew = props.id == 'new';
+const isNew = props.id == 'new' || props.id == '';
 const word1 = ref([] as string[]);
 const word2 = ref([] as string[]);
 const isLearnedFlg = ref(false);
-
-const load = async () => {
-  if (!isNew) {
-    $q.loading.show();
-    try {
-      const word = wordsStore.getWord(props.id);
-      if (word == null) {
-        throw new Error('unknown word');
-      }
-      title.value = word.word1.join(', ');
-      word1.value = word.word1;
-      word2.value = word.word2;
-      isLearnedFlg.value = word.isLearnedFlg;
-    } catch (error) {
-      $q.notify({
-        type: 'negative',
-        message: `The document ${props.id} failed to load: ${error}!`,
-        timeout: 2000,
-      });
-      router.push('/word');
-    } finally {
-      $q.loading.hide();
-    }
-  }
-};
 
 onMounted(() => {
   watch(
@@ -139,36 +114,61 @@ onMounted(() => {
   );
 });
 
+const load = async () => {
+  if (!isNew) {
+    $q.loading.show();
+    try {
+      const word = wordsStore.getWord(props.id);
+      if (word == null) {
+        throw new Error('Invalid ID');
+      }
+      title.value = word.word1.join(', ');
+      word1.value = word.word1;
+      word2.value = word.word2;
+      isLearnedFlg.value = word.isLearnedFlg;
+    } catch (error) {
+      console.error(error);
+      $q.notify({
+        type: 'negative',
+        message: `An error is occurred during load operation: ${error}!`,
+        timeout: 2000,
+      });
+      router.push('/word');
+    } finally {
+      $q.loading.hide();
+    }
+  }
+};
+
 const save = async () => {
   $q.loading.show();
   try {
     if (isNew) {
-      try {
-        await wordsStore.createWord(word1.value, word2.value, isLearnedFlg.value);
-      } catch (error) {
-        console.error(error);
-      }
+      await wordsStore.createWord(word1.value, word2.value, isLearnedFlg.value);
     } else {
-      try {
-        await wordsStore.updateWord(props.id, word1.value, word2.value, isLearnedFlg.value);
-      } catch (error) {
-        console.error(error);
-      }
+      await wordsStore.updateWord(props.id, word1.value, word2.value, isLearnedFlg.value);
     }
     router.push('/word');
+  } catch (error) {
+    console.error(error);
+    $q.notify({
+      type: 'negative',
+      message: `An error is occurred during update operation: ${error}!`,
+      timeout: 2000,
+    });
   } finally {
     $q.loading.hide();
   }
 };
 
-const cancel = async () => {
+const cancel = () => {
   router.push('/word');
 };
 
-const del = async () => {
+const del = () => {
   $q.dialog({
     title: 'Confirmation',
-    message: 'Do yo want delete this word?',
+    message: 'Do you really want to delete selected pairs?',
     cancel: true,
     focus: 'cancel',
   }).onOk(async () => {
@@ -181,6 +181,13 @@ const del = async () => {
         timeout: 2000,
       });
       router.push('/word');
+    } catch (error) {
+      console.error(error);
+      $q.notify({
+        type: 'negative',
+        message: `An error is occurred during delete operation: ${error}!`,
+        timeout: 2000,
+      });
     } finally {
       $q.loading.hide();
     }
