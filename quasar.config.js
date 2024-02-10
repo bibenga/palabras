@@ -50,7 +50,7 @@ module.exports = configure(function (/* ctx */) {
     build: {
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        node: 'node16',
+        node: 'node20',
       },
 
       vueRouterMode: 'history', // available values: 'hash', 'history'
@@ -88,17 +88,13 @@ module.exports = configure(function (/* ctx */) {
       //     },
       //   ],
       // ],
-      build: {
-        uglifyOptions: {
-          // compress: { drop_console: true },
-        },
-      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
       open: false, // opens browser window automatically
+      // vueDevtools: true,
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
