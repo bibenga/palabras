@@ -70,24 +70,22 @@
 </style>
 
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
 import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
-
-const errorMessage = ref('');
-// const codeRef = ref<QInput>();
-const username = ref<string>();
-const password = ref<string>();
-// const code = ref<string>('4729');
-
 const fireauth = inject<Auth>('fireauth');
 
-const redirectOnLogin = () => {
+const errorMessage = ref('');
+const username = ref<string>();
+const password = ref<string>();
+
+const redirectAfterRegister = () => {
   const to =
     route.query.redirect && typeof route.query.redirect === 'string'
       ? route.query.redirect
@@ -96,27 +94,30 @@ const redirectOnLogin = () => {
   router.push(to);
 };
 
-const register = () => {
-  $q.loading.show();
+onMounted(async () => {
+  const currentUser = await getCurrentUser();
+  if (currentUser) {
+    redirectAfterRegister();
+  }
+});
 
+const register = () => {
+  if (!fireauth) {
+    return;
+  }
+  if (!username.value || !password.value) {
+    return;
+  }
+  $q.loading.show();
   createUserWithEmailAndPassword(fireauth, username.value, password.value)
     .then(() => {
-      // userCredential
-      // const user = userCredential.user;
-
-      // const userName = user.displayName || user.email;
-      // $q.notify({
-      //   type: 'positive',
-      //   message: `Welcome ${userName}!`,
-      //   timeout: 1000,
-      // });
-
-      redirectOnLogin();
-      $q.loading.hide();
+      redirectAfterRegister();
     })
     .catch((error) => {
       console.log('error', error);
       errorMessage.value = error.message;
+    })
+    .finally(() => {
       $q.loading.hide();
     });
 };

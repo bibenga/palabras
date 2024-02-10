@@ -53,7 +53,7 @@
             class="login-btn"
             color="primary"
             icon="follow_the_signs"
-            @click.prevent="() => loginWithGoogle()"
+            @click.prevent="loginWithGoogle"
           />
         </q-card-actions>
       </q-card>
@@ -92,15 +92,14 @@ import { getCurrentUser } from 'vuefire';
 const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
+const fireauth = inject<Auth>('fireauth');
 
 const errorMessage = ref('');
 const username = ref<string>();
 const password = ref<string>();
 const valid = ref<boolean>();
 
-const fireauth = inject<Auth>('fireauth');
-
-const redirectOnLogin = () => {
+const redirectAfterLogin = () => {
   const to =
     route.query.redirect && typeof route.query.redirect === 'string'
       ? route.query.redirect
@@ -112,36 +111,37 @@ const redirectOnLogin = () => {
 onMounted(async () => {
   const currentUser = await getCurrentUser();
   if (currentUser) {
-    redirectOnLogin();
+    redirectAfterLogin();
   }
 });
 
 const login = () => {
+  if (!fireauth) {
+    return;
+  }
+  if (!username.value || !password.value) {
+    return;
+  }
   $q.loading.show();
-
   signInWithEmailAndPassword(fireauth, username.value, password.value)
     .then((userCredential) => {
       const user = userCredential.user;
       console.log('user', user);
-
-      // const userName = user.displayName || user.email;
-      // $q.notify({
-      //   type: 'positive',
-      //   message: `Welcome ${userName}!`,
-      //   timeout: 1000,
-      // });
-
-      $q.loading.hide();
-      redirectOnLogin();
+      redirectAfterLogin();
     })
     .catch((error) => {
       console.log('error', error);
       errorMessage.value = error.message;
+    })
+    .finally(() => {
       $q.loading.hide();
     });
 };
 
 const loginWithGoogle = () => {
+  if (!fireauth) {
+    return;
+  }
   const provider = new GoogleAuthProvider();
   // provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
   // provider.setCustomParameters({
@@ -163,7 +163,7 @@ const loginWithGoogle = () => {
       //   message: `Welcome ${userName}!`,
       //   timeout: 1000,
       // });
-      redirectOnLogin();
+      redirectAfterLogin();
     })
     .catch((error) => {
       // const errorCode = error.code;

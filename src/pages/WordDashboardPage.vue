@@ -42,6 +42,7 @@ const today = computed(() => {
   }
   return res;
 });
+
 const yeasterday = computed(() => {
   const now = toDate(new Date());
   const res: Task[] = [];
@@ -53,6 +54,7 @@ const yeasterday = computed(() => {
   }
   return res;
 });
+
 const previously = computed(() => {
   const now = toDate(new Date());
   const res: Task[] = [];

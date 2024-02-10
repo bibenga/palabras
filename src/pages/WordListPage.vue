@@ -259,28 +259,28 @@ const columns = [
   {
     name: 'word1',
     label: 'Word1',
-    field: (row) => row.word1,
+    field: (row: Word) => row.word1,
     required: true,
     align: 'left',
-    format: (val) => val?.join('; '),
+    format: (val?: string[]) => val?.join('; '),
     // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'word2',
     label: 'Word2',
-    field: (row) => row.word2,
+    field: (row: Word) => row.word2,
     required: true,
     align: 'left',
-    format: (val) => val?.join('; '),
+    format: (val?: string[]) => val?.join('; '),
     // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'isLearnedFlg',
     label: 'Learned',
-    field: (row) => row.isLearnedFlg,
+    field: (row: Word) => row.isLearnedFlg,
     required: true,
     align: 'center',
-    format: (val) => (val ? 'yes' : 'no'),
+    format: (val: boolean) => (val ? 'yes' : 'no'),
     // style: 'width: 0px',
   },
 ];
@@ -308,7 +308,7 @@ const add = () => {
 //   router.push(`/word/${doc.id}`);
 // };
 
-const rowClicked = (row) => {
+const rowClicked = (row: Word) => {
   console.log('rowClicked', row.id);
   router.push(`/word/${row.id}`);
 };
