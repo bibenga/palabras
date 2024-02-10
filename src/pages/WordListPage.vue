@@ -258,28 +258,28 @@ const wordsFiltered = computed<Word[]>(() => {
 const columns = [
   {
     name: 'word1',
-    required: true,
     label: 'Word1',
-    align: 'left',
     field: (row) => row.word1,
+    required: true,
+    align: 'left',
     format: (val) => val?.join('; '),
     // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'word2',
-    required: true,
     label: 'Word2',
-    align: 'left',
     field: (row) => row.word2,
+    required: true,
+    align: 'left',
     format: (val) => val?.join('; '),
     // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'isLearnedFlg',
-    required: true,
     label: 'Learned',
-    align: 'center',
     field: (row) => row.isLearnedFlg,
+    required: true,
+    align: 'center',
     format: (val) => (val ? 'yes' : 'no'),
     // style: 'width: 0px',
   },
@@ -317,7 +317,10 @@ const del = async () => {
   const docs = selected.value;
   $q.dialog({
     title: 'Confirmation',
-    message: `Do yo want to delete selected ${docs.length} word/words?`,
+    message:
+      docs.length == 1
+        ? 'Do yo want to delete selected word?'
+        : `Do yo want to delete ${docs.length} selected words?`,
     cancel: true,
     focus: 'cancel',
   }).onOk(async () => {
