@@ -211,7 +211,7 @@
 </style>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
+import { QTableProps, useQuasar } from 'quasar';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useWordsStore } from 'src/stores/words';
@@ -255,7 +255,7 @@ const wordsFiltered = computed<Word[]>(() => {
   return res;
 });
 
-const columns = [
+const columns: QTableProps['columns'] = [
   {
     name: 'word1',
     label: 'Word1',
