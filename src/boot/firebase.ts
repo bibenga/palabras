@@ -2,7 +2,6 @@ import { boot } from 'quasar/wrappers';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
   Firestore,
-  getFirestore,
   initializeFirestore,
   persistentLocalCache,
   persistentMultipleTabManager,
@@ -27,13 +26,12 @@ export default boot(async ({ app, router }) => {
   fireauth.useDeviceLanguage();
   console.debug('fireauth', fireauth);
 
-  initializeFirestore(firebase, {
+  const firestore = initializeFirestore(firebase, {
     localCache: persistentLocalCache({
       tabManager: persistentMultipleTabManager(),
     }),
   });
-
-  const firestore = getFirestore(firebase);
+  // const firestore = getFirestore(firebase);
   console.debug('firestore', firestore);
 
   app.config.globalProperties.$firebase = firebase;
