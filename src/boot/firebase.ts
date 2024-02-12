@@ -12,9 +12,9 @@ import { VueFire, VueFireAuth, getCurrentUser } from 'vuefire';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    firebase: FirebaseApp;
-    fireauth: Auth;
-    firestore: Firestore;
+    $firebase: FirebaseApp;
+    $fireauth: Auth;
+    $firestore: Firestore;
   }
 }
 

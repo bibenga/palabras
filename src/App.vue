@@ -4,13 +4,14 @@
 
 <script setup lang="ts">
 import { Auth, onAuthStateChanged } from 'firebase/auth';
-import { inject } from 'vue';
+import { inject, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
 const fireauth = inject<Auth>('fireauth');
-onAuthStateChanged(fireauth, (authUser) => {
+
+const authListenerUnsubscribe = onAuthStateChanged(fireauth, (authUser) => {
   // we should redirect to login page when user pressed a logout button in another tab
   // console.debug('[app]', route.path, authUser);
   if (authUser === null && route.meta.requiresAuth) {
@@ -21,5 +22,9 @@ onAuthStateChanged(fireauth, (authUser) => {
       },
     });
   }
+});
+onBeforeUnmount(() => {
+  // clear up listener
+  authListenerUnsubscribe();
 });
 </script>
