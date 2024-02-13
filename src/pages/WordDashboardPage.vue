@@ -1,7 +1,7 @@
 <template>
-  <q-page v-if="ready">
+  <q-page v-if="!pending">
     <div class="q-px-lg q-py-md">
-      <q-timeline v-if="tasks.length > 0" color="secondary">
+      <q-timeline v-if="tasks" color="secondary">
         <TaskTimelineEntries :tasks="today" label="Today" timeFormat="timeAgo" />
         <TaskTimelineEntries :tasks="yeasterday" label="Yeasterday" timeFormat="time" />
         <TaskTimelineEntries :tasks="previously" label="Previously" timeFormat="full" />
@@ -13,13 +13,43 @@
 
 <script setup lang="ts">
 import TaskTimelineEntries from 'components/TaskTimelineEntries.vue';
-import { useTasksStore } from 'src/stores/tasks';
-import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { Task } from 'src/stores/models';
+import { firestoreDefaultConverter, useCollection, useCurrentUser, useFirestore } from 'vuefire';
+import { DocumentData, collection, limit, orderBy, query, where } from 'firebase/firestore';
 
-const tasksStore = useTasksStore();
-const { tasks, ready } = storeToRefs(tasksStore);
+const firestore = useFirestore()!;
+const user = useCurrentUser();
+const tasksCol = collection(firestore, 'tasks');
+const { data: tasks, pending } = useCollection<Task>(() => {
+  if (user.value) {
+    return query(
+      tasksCol,
+      where('userId', '==', user.value.uid),
+      orderBy('createdTs', 'desc'),
+      limit(100),
+    ).withConverter<Task, DocumentData>({
+      fromFirestore: (snapshot) => {
+        const v = firestoreDefaultConverter.fromFirestore(snapshot)!;
+        return {
+          id: v.id,
+          userId: v.userId,
+          createdTs: v.createdTs.toDate(),
+          updatedTs: v.updatedTs?.toDate() || v.createdTs.toDate(),
+
+          isDoneFlg: v.isDoneFlg,
+          isSkipedFlg: v.isSkipedFlg,
+          errorCount: v.errorCount,
+
+          type: v.type,
+          words: v.words,
+        } as Task;
+      },
+      toFirestore: firestoreDefaultConverter.toFirestore,
+    });
+  }
+  return null;
+});
 
 const oneDay = 24 * 60 * 60 * 1000;
 const toDate = (d: Date): Date => {
@@ -31,39 +61,39 @@ const toDate = (d: Date): Date => {
   return c;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const today = computed(() => {
-  const now = toDate(new Date());
-  const res: Task[] = [];
-  for (const t of tasks.value) {
-    const tDate = toDate(t.createdTs);
-    if (now.getTime() - tDate.getTime() == 0) {
-      res.push(t);
-    }
+  if (tasks.value) {
+    const now = toDate(new Date());
+    return tasks.value.filter((t) => {
+      const tDate = toDate(t.createdTs);
+      return now.getTime() - tDate.getTime() == 0;
+    });
   }
-  return res;
+  return null;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const yeasterday = computed(() => {
-  const now = toDate(new Date());
-  const res: Task[] = [];
-  for (const t of tasks.value) {
-    const tDate = toDate(t.createdTs);
-    if (now.getTime() - tDate.getTime() == oneDay) {
-      res.push(t);
-    }
+  if (tasks.value) {
+    const now = toDate(new Date());
+    return tasks.value.filter((t) => {
+      const tDate = toDate(t.createdTs);
+      return now.getTime() - tDate.getTime() == oneDay;
+    });
   }
-  return res;
+  return null;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const previously = computed(() => {
-  const now = toDate(new Date());
-  const res: Task[] = [];
-  for (const t of tasks.value) {
-    const tDate = toDate(t.createdTs);
-    if (now.getTime() - tDate.getTime() > oneDay) {
-      res.push(t);
-    }
+  if (tasks.value) {
+    const now = toDate(new Date());
+    return tasks.value.filter((t) => {
+      const tDate = toDate(t.createdTs);
+      return now.getTime() - tDate.getTime() > oneDay;
+    });
   }
-  return res;
+  return null;
 });
 </script>

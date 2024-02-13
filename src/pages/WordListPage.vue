@@ -1,5 +1,5 @@
 <template>
-  <q-page v-if="ready">
+  <q-page v-if="!pending">
     <q-table
       title="Tus palabras para estudiar"
       :rows="wordsFiltered"
@@ -11,7 +11,7 @@
       virtual-scroll
       v-model:pagination="pagination"
       :rows-per-page-options="[0]"
-      :loading="!ready"
+      :loading="pending"
       binary-state-sort
       @row-click="(evt, row, index) => rowClicked(row)"
       card-class="no-shadow"
@@ -34,7 +34,7 @@
       <template v-slot:top>
         <q-btn
           @click="() => loadDemoWords('es-ru')"
-          v-if="ready && words.length == 0"
+          v-if="!pending && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
@@ -44,7 +44,7 @@
         />
         <q-btn
           @click="() => loadDemoWords('es-en')"
-          v-if="ready && words.length == 0"
+          v-if="!pending && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
@@ -54,7 +54,7 @@
         />
         <q-btn
           @click="() => loadDemoWords('en-ru')"
-          v-if="ready && words.length == 0"
+          v-if="!pending && words.length == 0"
           unelevated
           outline
           class="q-ml-sm btn"
@@ -65,7 +65,7 @@
 
         <q-btn
           @click="() => add()"
-          v-if="ready && words.length < 1000 && selected.length === 0"
+          v-if="!pending && words.length < 1000 && selected.length === 0"
           unelevated
           class="q-ml-sm btn"
           color="primary"
@@ -223,15 +223,14 @@ const $q = useQuasar();
 const router = useRouter();
 
 const firestore = useFirestore()!;
-const wordsCol = collection(firestore, 'words');
 const user = useCurrentUser();
+const wordsCol = collection(firestore, 'words');
 const { data: words, pending } = useCollection<Word>(() => {
   if (user.value) {
     return query(wordsCol, where('userId', '==', user.value.uid), orderBy('word1', 'asc'));
   }
   return null;
 });
-const ready = computed(() => !pending.value);
 
 const pagination = ref({ rowsPerPage: 0 });
 const selected = ref([] as Word[]);
