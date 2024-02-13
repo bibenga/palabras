@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
-import { inject, ref } from 'vue';
+import { ref } from 'vue';
 import {
   DocumentData,
-  Firestore,
   QueryDocumentSnapshot,
   Unsubscribe,
   addDoc,
   collection,
   deleteDoc,
   doc,
+  getFirestore,
   onSnapshot,
   orderBy,
   query,
@@ -16,20 +16,16 @@ import {
   where,
   writeBatch,
 } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Word } from './models';
 
 export const useWordsStore = defineStore('words', () => {
   console.log('[words.setup]');
 
-  const fireauth = inject<Auth>('fireauth');
-  const firestore = inject<Firestore>('firestore');
+  const fireauth = getAuth();
+  const firestore = getFirestore();
   const wordsCol = collection(firestore, 'words');
 
-  // let readyResolve: (value: unknown) => void;
-  // const readyPromise = new Promise((_resolve) => {
-  //   readyResolve = _resolve;
-  // });
   const ready = ref(false);
   const words = ref([] as Word[]);
 
@@ -47,6 +43,17 @@ export const useWordsStore = defineStore('words', () => {
       updatedTs: d.data().updatedTs?.toDate() || d.data().createdTs.toDate(),
     };
   };
+
+  onAuthStateChanged(fireauth, (authUser) => {
+    user = authUser;
+    console.debug('[words.onAuthStateChanged]', authUser?.uid);
+    if (user) {
+      cleanup();
+      init();
+    } else {
+      cleanup();
+    }
+  });
 
   let wordsUnsubscribe: Unsubscribe | null = null;
   const init = () => {
@@ -71,24 +78,13 @@ export const useWordsStore = defineStore('words', () => {
   };
 
   const cleanup = () => {
-    console.debug('[words.cleanup]');
     if (wordsUnsubscribe != null) {
+      console.debug('[words.cleanup]');
       wordsUnsubscribe();
       wordsUnsubscribe = null;
       words.value = [];
     }
   };
-
-  onAuthStateChanged(fireauth, (authUser) => {
-    user = authUser;
-    console.debug('[words.onAuthStateChanged]', authUser?.uid);
-    if (user) {
-      cleanup();
-      init();
-    } else {
-      cleanup();
-    }
-  });
 
   const getWord = (id: string): Word | null => {
     const items = words.value;

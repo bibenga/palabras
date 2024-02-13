@@ -78,12 +78,12 @@
 </style>
 
 <script setup lang="ts">
-import { inject, onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
 import {
-  Auth,
   GoogleAuthProvider,
+  getAuth,
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth';
@@ -91,7 +91,7 @@ import {
 const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
-const fireauth = inject<Auth>('fireauth');
+const fireauth = getAuth();
 
 const errorMessage = ref('');
 const username = ref<string>();
@@ -107,19 +107,7 @@ const redirectAfterLogin = () => {
   router.push(to);
 };
 
-onMounted(async () => {
-  // the fireauth?.authStateReady() is acalled in boot/firebase.ts:router.beforeEach
-  const currentUser = fireauth?.currentUser;
-  console.log(`[Registerage.onMounted]: currentUser=${currentUser}`);
-  if (currentUser) {
-    redirectAfterLogin();
-  }
-});
-
 const login = () => {
-  if (!fireauth) {
-    return;
-  }
   if (!username.value || !password.value) {
     return;
   }
@@ -140,9 +128,6 @@ const login = () => {
 };
 
 const loginWithGoogle = () => {
-  if (!fireauth) {
-    return;
-  }
   const provider = new GoogleAuthProvider();
   // provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
   // provider.setCustomParameters({

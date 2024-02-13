@@ -8,7 +8,6 @@ import {
 } from 'firebase/firestore';
 import { Auth, getAuth } from 'firebase/auth';
 import firebaseConfig from './firebase.json';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -44,20 +43,17 @@ export default boot(async ({ app, router }) => {
 
   router.beforeEach(async (to) => {
     // routes with `meta: { requiresAuth: true }` will check for the users, others won't
-    await fireauth?.authStateReady();
-    if (to.meta.requiresAuth) {
-      const currentUser = fireauth?.currentUser;
-      // const currentUser = await getCurrentUser();
-      // if the user is not logged in, redirect to the login page
-      if (!currentUser) {
-        return {
-          path: '/login',
-          query: {
-            // we keep the current path in the query so we can redirect to it after login
-            // with `router.push(route.query.redirect || '/')`
-            redirect: to.fullPath,
-          },
-        };
+    await fireauth.authStateReady();
+    console.log(`[firebase.beforeEach]: to=${to.path}`);
+    const authUser = fireauth.currentUser;
+    if (authUser) {
+      const loginRoutes = ['/login', '/register'];
+      if (loginRoutes.includes(to.path)) {
+        return { path: '/dashboard' };
+      }
+    } else {
+      if (to.meta.requiresAuth) {
+        return { path: '/login', query: { redirect: to.fullPath } };
       }
     }
   });

@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
-import { inject, ref } from 'vue';
+import { ref } from 'vue';
 import {
   DocumentData,
-  Firestore,
   QueryDocumentSnapshot,
   Unsubscribe,
   addDoc,
@@ -15,7 +14,8 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged, getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 import { useWordsStore } from './words';
 import shuffle from 'lodash/shuffle';
 import { Task, TaskWord, TaskType, TaskProgress } from './models';
@@ -23,8 +23,8 @@ import { Task, TaskWord, TaskType, TaskProgress } from './models';
 export const useTasksStore = defineStore('tasks', () => {
   console.log('[tasks.setup]');
 
-  const fireauth = inject<Auth>('fireauth');
-  const firestore = inject<Firestore>('firestore');
+  const fireauth = getAuth();
+  const firestore = getFirestore();
   const tasksCol = collection(firestore, 'tasks');
 
   const wordsStore = useWordsStore();
@@ -59,6 +59,17 @@ export const useTasksStore = defineStore('tasks', () => {
       words: d.data().words,
     };
   };
+
+  onAuthStateChanged(fireauth, (authUser) => {
+    user = authUser;
+    console.debug('[tasks.onAuthStateChanged]', authUser?.uid);
+    if (user) {
+      cleanup();
+      init();
+    } else {
+      cleanup();
+    }
+  });
 
   let tasksUnsubscribe: Unsubscribe | null = null;
   const init = () => {
@@ -114,17 +125,6 @@ export const useTasksStore = defineStore('tasks', () => {
       statistics.value = null;
     }
   };
-
-  onAuthStateChanged(fireauth, (authUser) => {
-    user = authUser;
-    console.debug('[tasks.onAuthStateChanged]', authUser?.uid);
-    if (user) {
-      cleanup();
-      init();
-    } else {
-      cleanup();
-    }
-  });
 
   const newTask = async (type: TaskType): Promise<boolean> => {
     if (type === 'translation') {

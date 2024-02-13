@@ -70,15 +70,15 @@
 </style>
 
 <script setup lang="ts">
-import { inject, onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
-import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 
 const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
-const fireauth = inject<Auth>('fireauth');
+const fireauth = getAuth();
 
 const errorMessage = ref('');
 const username = ref<string>();
@@ -93,18 +93,7 @@ const redirectAfterRegister = () => {
   router.push(to);
 };
 
-onMounted(() => {
-  const currentUser = fireauth?.currentUser;
-  // const currentUser = await getCurrentUser();
-  if (currentUser) {
-    redirectAfterRegister();
-  }
-});
-
 const register = () => {
-  if (!fireauth) {
-    return;
-  }
   if (!username.value || !password.value) {
     return;
   }

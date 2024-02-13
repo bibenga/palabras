@@ -77,14 +77,14 @@
 </template>
 
 <script setup lang="ts">
-import { Auth, signOut, User } from 'firebase/auth';
+import { getAuth, signOut, User } from 'firebase/auth';
 import { useQuasar } from 'quasar';
 import { inject, ref, Ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const router = useRouter();
-const fireauth = inject<Auth>('fireauth');
+const fireauth = getAuth();
 const user = inject<Ref<User | null>>('user');
 
 function logout() {
