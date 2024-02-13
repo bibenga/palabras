@@ -77,15 +77,16 @@
 </template>
 
 <script setup lang="ts">
-import { getAuth, signOut, User } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { useQuasar } from 'quasar';
-import { inject, ref, Ref } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useCurrentUser, useFirebaseAuth } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
-const fireauth = getAuth();
-const user = inject<Ref<User | null>>('user');
+const fireauth = useFirebaseAuth()!;
+const user = useCurrentUser();
 
 function logout() {
   $q.dialog({

@@ -81,21 +81,17 @@
 import { ref } from 'vue';
 import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
-import {
-  GoogleAuthProvider,
-  getAuth,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from 'firebase/auth';
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { useFirebaseAuth } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
-const fireauth = getAuth();
+const fireauth = useFirebaseAuth()!;
 
 const errorMessage = ref('');
-const username = ref<string>();
-const password = ref<string>();
+const username = ref<string>('');
+const password = ref<string>('');
 const valid = ref<boolean>();
 
 const redirectAfterLogin = () => {

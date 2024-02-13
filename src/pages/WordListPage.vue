@@ -214,22 +214,35 @@
 import { QTableProps, useQuasar } from 'quasar';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useWordsStore } from 'src/stores/words';
-import { storeToRefs } from 'pinia';
 import { Word } from 'src/stores/models';
 import deburr from 'lodash/deburr';
+import { useCollection, useCurrentUser, useFirestore } from 'vuefire';
+import { collection, doc, orderBy, query, where, writeBatch } from 'firebase/firestore';
 
 const $q = useQuasar();
 const router = useRouter();
 
-const wordsStore = useWordsStore();
-const { words, ready } = storeToRefs(wordsStore);
+const firestore = useFirestore()!;
+const wordsCol = collection(firestore, 'words');
+const user = useCurrentUser();
+const { data: words, pending } = useCollection<Word>(() => {
+  if (user.value) {
+    return query(wordsCol, where('userId', '==', user.value.uid), orderBy('word1', 'asc'));
+  }
+  return null;
+});
+const ready = computed(() => !pending.value);
 
 const pagination = ref({ rowsPerPage: 0 });
 const selected = ref([] as Word[]);
 
 const filter = ref('');
-const wordsFiltered = computed<Word[]>(() => {
+
+const wordsFiltered = computed(() => {
+  if (!words.value) {
+    return [];
+  }
+
   console.log('filter', filter.value);
   if (filter.value == '') {
     return words.value;
@@ -263,7 +276,6 @@ const columns: QTableProps['columns'] = [
     required: true,
     align: 'left',
     format: (val?: string[]) => val?.join('; '),
-    // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'word2',
@@ -272,7 +284,6 @@ const columns: QTableProps['columns'] = [
     required: true,
     align: 'left',
     format: (val?: string[]) => val?.join('; '),
-    // style: 'width: 50%; max-width: 50%;',
   },
   {
     name: 'isLearnedFlg',
@@ -281,7 +292,6 @@ const columns: QTableProps['columns'] = [
     required: true,
     align: 'center',
     format: (val: boolean) => (val ? 'yes' : 'no'),
-    // style: 'width: 0px',
   },
 ];
 
@@ -289,13 +299,64 @@ const loadDemoWords = async (code: string) => {
   console.log(`loadDemoWords: ${code}`);
   $q.loading.show();
   try {
-    const loaded = await wordsStore.loadDemoWords(code);
+    const loaded = await loadDemoWordsInt(code);
     $q.notify({
       message: `Was added ${loaded} word pair`,
       timeout: 2000,
     });
   } finally {
     $q.loading.hide();
+  }
+};
+
+const loadDemoWordsInt = async (code: string): Promise<number> => {
+  try {
+    let newWordsRaw;
+    if (code === 'es-ru') {
+      newWordsRaw = (await import('../assets/es-ru.txt?raw')).default;
+    } else if (code == 'es-en') {
+      newWordsRaw = (await import('../assets/es-en.txt?raw')).default;
+    } else if (code == 'en-ru') {
+      newWordsRaw = (await import('../assets/en-ru.txt?raw')).default;
+    } else {
+      throw new Error(`the code "${code}" is not supported`);
+    }
+    return await parseAndSaveWords(newWordsRaw);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const parseAndSaveWords = async (text: string, wordSep = /\s*;\s*/): Promise<number> => {
+  try {
+    const pairSep = /\s*-\s*/;
+    const newWords = text
+      .split(/[\r\n]+/)
+      .map((line) => line.trim())
+      .filter((line) => line.length == 0 || !line.startsWith('#'))
+      .map((line) => line.split(pairSep))
+      .filter((line) => line.length == 2)
+      .map((line) => [line[0].split(wordSep), line[1].split(wordSep)]);
+
+    const batch = writeBatch(firestore);
+    for (const pair of newWords) {
+      const wordDoc = doc(wordsCol);
+      batch.set(wordDoc, {
+        userId: user.value?.uid || '',
+        word1: pair[0],
+        word2: pair[1],
+        isLearnedFlg: false,
+        random: Math.random(),
+        createdTs: new Date(),
+        updatedTs: new Date(),
+      });
+    }
+    await batch.commit();
+    return newWords.length;
+  } catch (error) {
+    console.error(error);
+    return -1;
   }
 };
 
@@ -326,7 +387,15 @@ const del = async () => {
   }).onOk(async () => {
     $q.loading.show();
     try {
-      await wordsStore.deleteWords(docs.map((d) => d.id));
+      const batch = writeBatch(firestore);
+      docs
+        .map((d) => d.id)
+        .forEach((id) => {
+          batch.delete(doc(wordsCol, id));
+        });
+      await batch.commit();
+      // await wordsStore.deleteWords(docs.map((d) => d.id));
+
       selected.value = [];
       $q.notify({
         message:

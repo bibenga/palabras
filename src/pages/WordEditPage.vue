@@ -1,10 +1,10 @@
 <template>
-  <q-page v-if="ready">
+  <q-page v-if="!pending">
     <q-form @submit.prevent="save" class="q-gutter-md">
       <q-card flat>
         <q-card-section>
           <div v-if="isNew" class="text-h6">Add new word</div>
-          <div v-else class="text-h6">Edit {{ title }} word</div>
+          <div v-else class="text-h6">Edit "{{ title }}" word</div>
         </q-card-section>
 
         <q-card-section>
@@ -80,73 +80,80 @@
 </style>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
+import { doc, collection, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useQuasar } from 'quasar';
-import { useWordsStore } from 'src/stores/words';
-import { onMounted, ref, watch } from 'vue';
+import { Word } from 'src/stores/models';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-const $q = useQuasar();
-const router = useRouter();
-
-const wordsStore = useWordsStore();
-const { ready } = storeToRefs(wordsStore);
+import { getCurrentUser, useDocument, useFirestore } from 'vuefire';
 
 const props = defineProps<{
   id: string;
 }>();
 
+const $q = useQuasar();
+const router = useRouter();
+
+const firestore = useFirestore()!;
+const wordsCol = collection(firestore, 'words');
+const { pending, promise } = useDocument<Word>(() => {
+  if (props.id == 'new') {
+    return null;
+  }
+  return doc(wordsCol, props.id);
+});
+
+const isNew = props.id == 'new';
 const title = ref('');
-const isNew = props.id == 'new' || props.id == '';
 const word1 = ref([] as string[]);
 const word2 = ref([] as string[]);
 const isLearnedFlg = ref(false);
 
-onMounted(() => {
-  watch(
-    ready,
-    (v) => {
-      if (v) {
-        load();
-      }
-    },
-    { immediate: true },
-  );
-});
-
-const load = async () => {
-  if (!isNew) {
-    $q.loading.show();
-    try {
-      const word = wordsStore.getWord(props.id);
-      if (word == null) {
-        throw new Error('Invalid ID');
-      }
-      title.value = word.word1.join(', ');
-      word1.value = word.word1;
-      word2.value = word.word2;
-      isLearnedFlg.value = word.isLearnedFlg;
-    } catch (error) {
-      console.error(error);
-      $q.notify({
-        type: 'negative',
-        message: `An error is occurred during load operation: ${error}!`,
-        timeout: 2000,
-      });
-      router.push('/word');
-    } finally {
-      $q.loading.hide();
+promise.value
+  .then((word) => {
+    if (props.id == 'new') {
+      return;
     }
-  }
-};
+    console.log(`load: word=${word?.id}`);
+    if (!word) {
+      throw new Error('Invalid ID');
+    }
+    title.value = word.word1.join(', ');
+    word1.value = word.word1;
+    word2.value = word.word2;
+    isLearnedFlg.value = word.isLearnedFlg;
+  })
+  .catch((error) => {
+    console.error(error);
+    $q.notify({
+      type: 'negative',
+      message: `An error is occurred during load operation: ${error}!`,
+      timeout: 2000,
+    });
+    router.push('/word');
+  });
 
 const save = async () => {
   $q.loading.show();
   try {
     if (isNew) {
-      await wordsStore.createWord(word1.value, word2.value, isLearnedFlg.value);
+      const user = (await getCurrentUser())!;
+      await addDoc(wordsCol, {
+        userId: user.uid || '',
+        word1: word1.value,
+        word2: word2.value,
+        isLearnedFlg: isLearnedFlg.value,
+        random: Math.random(),
+        createdTs: new Date(),
+        updatedTs: new Date(),
+      });
     } else {
-      await wordsStore.updateWord(props.id, word1.value, word2.value, isLearnedFlg.value);
+      await updateDoc(doc(wordsCol, props.id), {
+        word1: word1.value,
+        word2: word2.value,
+        isLearnedFlg: isLearnedFlg.value,
+        updatedTs: new Date(),
+      });
     }
     router.push('/word');
   } catch (error) {
@@ -175,7 +182,7 @@ const del = () => {
     $q.loading.show();
     try {
       console.log('del doc', props.id);
-      wordsStore.deleteWord(props.id);
+      await deleteDoc(doc(wordsCol, props.id));
       $q.notify({
         message: 'The document was deleted',
         timeout: 2000,

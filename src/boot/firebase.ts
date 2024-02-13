@@ -1,21 +1,13 @@
 import { boot } from 'quasar/wrappers';
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import {
-  Firestore,
   initializeFirestore,
   persistentLocalCache,
   persistentMultipleTabManager,
 } from 'firebase/firestore';
-import { Auth, getAuth } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import firebaseConfig from './firebase.json';
-
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $firebase: FirebaseApp;
-    $fireauth: Auth;
-    $firestore: Firestore;
-  }
-}
+import { VueFire, VueFireAuth, getCurrentUser } from 'vuefire';
 
 export default boot(async ({ app, router }) => {
   const firebase = initializeApp(firebaseConfig);
@@ -33,19 +25,15 @@ export default boot(async ({ app, router }) => {
   // const firestore = getFirestore(firebase);
   console.debug('firestore', firestore);
 
-  app.config.globalProperties.$firebase = firebase;
-  app.config.globalProperties.$firestore = firestore;
-  app.config.globalProperties.$fireauth = fireauth;
-
-  app.provide('firebase', firebase);
-  app.provide('firestore', firestore);
-  app.provide('fireauth', fireauth);
+  app.use(VueFire, {
+    firebaseApp: firebase,
+    modules: [VueFireAuth()],
+  });
 
   router.beforeEach(async (to) => {
     // routes with `meta: { requiresAuth: true }` will check for the users, others won't
-    await fireauth.authStateReady();
-    console.log(`[firebase.beforeEach]: to=${to.path}`);
-    const authUser = fireauth.currentUser;
+    const authUser = await getCurrentUser();
+    console.log(`[firebase.beforeEach]: to=${to.path}, user=${authUser?.uid}`);
     if (authUser) {
       const loginRoutes = ['/login', '/register'];
       if (loginRoutes.includes(to.path)) {

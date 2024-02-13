@@ -1,90 +1,62 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
 import {
-  DocumentData,
-  QueryDocumentSnapshot,
-  Unsubscribe,
   addDoc,
   collection,
   deleteDoc,
   doc,
   getFirestore,
-  onSnapshot,
   orderBy,
   query,
   updateDoc,
   where,
   writeBatch,
 } from 'firebase/firestore';
-import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Word } from './models';
+import { useCollection, useCurrentUser } from 'vuefire';
+import { computed } from 'vue';
 
 export const useWordsStore = defineStore('words', () => {
   console.log('[words.setup]');
 
-  const fireauth = getAuth();
   const firestore = getFirestore();
   const wordsCol = collection(firestore, 'words');
 
-  const ready = ref(false);
-  const words = ref([] as Word[]);
+  const user = useCurrentUser();
 
-  let user: User | null = null;
-
-  const deserialize = (d: QueryDocumentSnapshot<DocumentData>): Word => {
-    return {
-      id: d.id,
-      userId: d.data().userId,
-      word1: d.data().word1,
-      word2: d.data().word2,
-      isLearnedFlg: d.data().isLearnedFlg,
-      random: d.data().random,
-      createdTs: d.data().createdTs.toDate(),
-      updatedTs: d.data().updatedTs?.toDate() || d.data().createdTs.toDate(),
-    };
-  };
-
-  onAuthStateChanged(fireauth, (authUser) => {
-    user = authUser;
-    console.debug('[words.onAuthStateChanged]', authUser?.uid);
-    if (user) {
-      cleanup();
-      init();
-    } else {
-      cleanup();
+  // const { data: words, pending } = useCollection(() => {
+  //   if (user.value) {
+  //     const wordsQuery = query(
+  //       wordsCol,
+  //       where('userId', '==', user.value.uid),
+  //       orderBy('word1', 'asc'),
+  //     );
+  //     return wordsQuery.withConverter<Word, DocumentData>({
+  //       fromFirestore: (snapshot) => firestoreDefaultConverter.fromFirestore(snapshot) as Word,
+  //       toFirestore: firestoreDefaultConverter.toFirestore,
+  //     });
+  //   }
+  //   return null;
+  // });
+  const { data: words, pending } = useCollection<Word>(() => {
+    if (user.value) {
+      return query(wordsCol, where('userId', '==', user.value.uid), orderBy('word1', 'asc'));
     }
+    return null;
   });
+  const ready = computed(() => !pending.value);
 
-  let wordsUnsubscribe: Unsubscribe | null = null;
-  const init = () => {
-    console.debug('[words.init]', user?.uid);
-    if (user == null) {
-      ready.value = false;
-      words.value = [];
-      return;
-    }
-    const wordsQuery = query(wordsCol, where('userId', '==', user.uid), orderBy('word1', 'asc'));
-    wordsUnsubscribe = onSnapshot(wordsQuery, (snapshot) => {
-      const res = [];
-      for (const wordDoc of snapshot.docs) {
-        const word: Word = deserialize(wordDoc);
-        res.push(word);
-      }
-      console.debug('[words.onSnapshot]', res);
-      words.value = res;
-      ready.value = true;
-      // readyResolve(true);
-    });
-  };
-
-  const cleanup = () => {
-    if (wordsUnsubscribe != null) {
-      console.debug('[words.cleanup]');
-      wordsUnsubscribe();
-      wordsUnsubscribe = null;
-      words.value = [];
-    }
-  };
+  // const deserialize = (d: QueryDocumentSnapshot<DocumentData>): Word => {
+  //   return {
+  //     id: d.id,
+  //     userId: d.data().userId,
+  //     word1: d.data().word1,
+  //     word2: d.data().word2,
+  //     isLearnedFlg: d.data().isLearnedFlg,
+  //     random: d.data().random,
+  //     createdTs: d.data().createdTs.toDate(),
+  //     updatedTs: d.data().updatedTs?.toDate() || d.data().createdTs.toDate(),
+  //   };
+  // };
 
   const getWord = (id: string): Word | null => {
     const items = words.value;
@@ -136,7 +108,7 @@ export const useWordsStore = defineStore('words', () => {
     isLearnedFlg: boolean,
   ): Promise<void> => {
     await addDoc(wordsCol, {
-      userId: user?.uid || '',
+      userId: user.value?.uid || '',
       word1: word1,
       word2: word2,
       isLearnedFlg: isLearnedFlg,
@@ -195,7 +167,7 @@ export const useWordsStore = defineStore('words', () => {
       for (const pair of newWords) {
         const wordDoc = doc(wordsCol);
         batch.set(wordDoc, {
-          userId: user?.uid || '',
+          userId: user.value?.uid || '',
           word1: pair[0],
           word2: pair[1],
           isLearnedFlg: false,
