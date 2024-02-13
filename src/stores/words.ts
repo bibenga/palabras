@@ -83,6 +83,7 @@ export const useWordsStore = defineStore('words', () => {
     user = authUser;
     console.debug('[words.onAuthStateChanged]', authUser?.uid);
     if (user) {
+      cleanup();
       init();
     } else {
       cleanup();

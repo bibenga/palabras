@@ -77,32 +77,15 @@
 </template>
 
 <script setup lang="ts">
-import { Auth, signOut, User, onAuthStateChanged } from 'firebase/auth';
+import { Auth, signOut, User } from 'firebase/auth';
 import { useQuasar } from 'quasar';
-import { inject, ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { inject, ref, Ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const router = useRouter();
-const route = useRoute();
 const fireauth = inject<Auth>('fireauth');
-const user = ref<User | null>(null);
-
-onMounted(() => {
-  const currentUser = fireauth?.currentUser;
-  if (currentUser) {
-    user.value = currentUser;
-  }
-});
-
-const authListenerUnsubscribe = onAuthStateChanged(fireauth, (authUser) => {
-  user.value = authUser;
-  console.log(`[MainLayout.onAuthStateChanged]: user=${authUser?.uid}, route=${route.path}`);
-});
-onBeforeUnmount(() => {
-  // clear up listener
-  authListenerUnsubscribe();
-});
+const user = inject<Ref<User | null>>('user');
 
 function logout() {
   $q.dialog({
