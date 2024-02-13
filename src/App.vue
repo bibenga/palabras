@@ -14,13 +14,21 @@ const fireauth = inject<Auth>('fireauth');
 const authListenerUnsubscribe = onAuthStateChanged(fireauth, (authUser) => {
   // we should redirect to login page when user pressed a logout button in another tab
   // console.debug('[app]', route.path, authUser);
-  if (authUser === null && route.meta.requiresAuth) {
-    router.push({
-      path: '/login',
-      query: {
-        redirect: route.fullPath,
-      },
-    });
+  console.log(`[App.onAuthStateChanged]: user=${authUser?.uid}, route=${route.path}`);
+  if (authUser) {
+    const loginRoutes = ['/login', '/register'];
+    if (loginRoutes.includes(route.path)) {
+      router.push({
+        path: '/dashboard',
+      });
+    }
+  } else {
+    if (route.meta.requiresAuth) {
+      router.push({
+        path: '/login',
+        query: { redirect: route.fullPath },
+      });
+    }
   }
 });
 onBeforeUnmount(() => {

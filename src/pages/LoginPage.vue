@@ -87,7 +87,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth';
-import { getCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -109,7 +108,9 @@ const redirectAfterLogin = () => {
 };
 
 onMounted(async () => {
-  const currentUser = await getCurrentUser();
+  // the fireauth?.authStateReady() is acalled in boot/firebase.ts:router.beforeEach
+  const currentUser = fireauth?.currentUser;
+  console.log(`[Registerage.onMounted]: currentUser=${currentUser}`);
   if (currentUser) {
     redirectAfterLogin();
   }

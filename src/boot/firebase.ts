@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { Auth, getAuth } from 'firebase/auth';
 import firebaseConfig from './firebase.json';
-import { VueFire, VueFireAuth, getCurrentUser } from 'vuefire';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -42,15 +42,12 @@ export default boot(async ({ app, router }) => {
   app.provide('firestore', firestore);
   app.provide('fireauth', fireauth);
 
-  app.use(VueFire, {
-    firebaseApp: firebase,
-    modules: [VueFireAuth()],
-  });
-
   router.beforeEach(async (to) => {
     // routes with `meta: { requiresAuth: true }` will check for the users, others won't
+    await fireauth?.authStateReady();
     if (to.meta.requiresAuth) {
-      const currentUser = await getCurrentUser();
+      const currentUser = fireauth?.currentUser;
+      // const currentUser = await getCurrentUser();
       // if the user is not logged in, redirect to the login page
       if (!currentUser) {
         return {

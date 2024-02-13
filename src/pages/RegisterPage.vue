@@ -74,7 +74,6 @@ import { inject, onMounted, ref } from 'vue';
 import { useQuasar, QInput } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
 import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getCurrentUser } from 'vuefire';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -94,8 +93,9 @@ const redirectAfterRegister = () => {
   router.push(to);
 };
 
-onMounted(async () => {
-  const currentUser = await getCurrentUser();
+onMounted(() => {
+  const currentUser = fireauth?.currentUser;
+  // const currentUser = await getCurrentUser();
   if (currentUser) {
     redirectAfterRegister();
   }
